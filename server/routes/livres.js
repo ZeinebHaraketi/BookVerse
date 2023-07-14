@@ -1,5 +1,5 @@
 var express = require('express');
-const { getLivres, ajoutLivre, getLivre, modifierLivre, supprimerLivre } = require('../controllers/livreController');
+const { getLivres, ajoutLivre, getLivre, modifierLivre, supprimerLivre, rechercheLivres, triLivres, ajouterChapitreLivre, modifierChapitreLivre, supprimerChapitreLivre, ajouterAdaptationLivre, modifierAdaptationLivre, supprimerAdaptationLivre, ajouterCritiqueLivre, modifierCritiqueLivre, supprimerCritiqueLivre } = require('../controllers/livreController');
 var router = express.Router();
 
 const multer = require('multer');
@@ -32,5 +32,28 @@ router.post('/add',upload.single('image'),ajoutLivre);
 router.get('/:id', getLivre);
 router.put('/mod/:id',upload.single('image') ,modifierLivre);
 router.delete('/del/:id', supprimerLivre);
+
+router.get('/livres/recherche', rechercheLivres);
+router.get('/livres/tri', triLivres);
+
+//Chapitres
+router.post('/ajout/livres/:livreId/chapitres', ajouterChapitreLivre);
+router.put('/livres/:livreId/chapitres/:chapitreId', modifierChapitreLivre);
+router.delete('/supp/livres/:livreId/chapitres/:chapitreId', supprimerChapitreLivre);
+
+//Adaptations
+router.post('/ajout/livres/:livreId/adaptations', ajouterAdaptationLivre);
+//router.put('/upd/livres/:livreId/adaptation/:adaptationId', modifierAdaptationLivre);
+// Supprimer une adaptation d'un livre
+router.delete('/:livreId/adaptations/:adaptationId', supprimerAdaptationLivre);
+
+//Critiques
+router.post('/:livreId/critiques/:userId', ajouterCritiqueLivre); //Ca marche
+router.put('/:livreId/critiques/:userId/:critiqueId', modifierCritiqueLivre);
+router.delete('/supp/:livreId/critiques/:userId/:critiqueId', supprimerCritiqueLivre);
+
+
+
+
 
 module.exports = router;

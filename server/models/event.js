@@ -1,62 +1,24 @@
 const mongoose = require('mongoose');
 
 const eventSchema = new mongoose.Schema({
-  titre: {
-    type: String,
-    required: true
-  },
-  description: {
-    type: String,
-    required: true
-  },
-  date: {
-    type: Date,
-    required: true
-  },
-  time: {
-    type: String,
-    required: true
-  },
-  location: {
-    type: String,
-    required: true
-  },
-  clubDeLecture: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'ClubDeLecture'
-  },
-  organisateur: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User'
-  },
-  participants: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User'
-  }],
-  specialGuests: [{
-    type: String
-  }],
-  theme: {
-    type: String
-  },
-  activites: [{
-    type: String
-  }],
-  resources: [{
-    type: String
-  }],
-  commentaires: [{
-    user: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'User'
-    },
-    contenu: {
-      type: String
-    },
-    date: {
-      type: Date,
-      default: Date.now
-    }
+  titre: { type: String, required: true },
+  description: { type: String, required: true },
+  date: { type: Date,default: Date.now ,required: true },
+  time: { type: String, required: true },
+  location: { type: String, required: true },
+  clubDeLecture: { type: mongoose.Schema.Types.ObjectId, ref: 'ClubDeLecture' },
+  adaptation: { type: mongoose.Schema.Types.ObjectId, ref: 'Adaptation' },
+  organisateur: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  participants: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+  specialGuests: [{ type: String }],
+  theme: { type: String },
+  activites: [{ type: String }],
+  resources: [{ type: String }],
+  commentaires: 
+  [{
+    user: { type: mongoose.Schema.Types.ObjectId,ref: 'User'},
+    contenu: { type: String }, 
+    date: {type: Date, default: Date.now }
   }]
 });
 

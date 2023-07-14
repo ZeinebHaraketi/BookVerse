@@ -7,6 +7,7 @@ const crypto = require('crypto');
 
 
 
+
 require("dotenv").config();
 
 
@@ -286,7 +287,8 @@ const logout = (req, res) => {
   res.json({ message: 'Vous avez été déconnecté avec succès.' });
 };
 
-  
+
+
 
   
   

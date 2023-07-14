@@ -1,5 +1,5 @@
 var express = require('express');
-const { ajouterCludLecture, afficherClubs, afficherOneClub, modifierClub, supprimerClub, ajouterMembreClub, ajouterLivreClub, supprimerMembreClub, findAndSortClub } = require('../controllers/clubController');
+const { ajouterCludLecture, afficherClubs, afficherOneClub, modifierClub, supprimerClub, ajouterMembreClub, ajouterLivreClub, supprimerMembreClub, findAndSortClub, afficherLivresLus, ajouterReponseDiscussion, ajouterDiscussionClub, ajouterLikeDiscussion, ajouterDislikeDiscussion } = require('../controllers/clubController');
 var router = express.Router();
 
 
@@ -15,6 +15,19 @@ router.get('/findClub', findAndSortClub);
 router.put('/mod/:id', modifierClub);
 router.delete('/del/:id', supprimerClub);
 router.delete('/del/:id/membres/:memberId', supprimerMembreClub);
+
+router.get('/aff/:clubDeLectureId/livres-lus', afficherLivresLus);
+
+//Discussion
+//CA MARCHE PAS
+router.post('/:clubDeLectureId/discussions/:discussionId/membres/:membreId/reponses', ajouterReponseDiscussion);
+router.post('/:clubId/discussions/:userId', ajouterDiscussionClub);
+router.post('/:clubId/discussions/:discussionId/like', ajouterLikeDiscussion);
+router.post('/:clubId/discussions/:discussionId/dislike', ajouterDislikeDiscussion);
+
+
+
+
 
 
 

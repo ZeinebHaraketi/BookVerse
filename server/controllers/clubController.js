@@ -1,4 +1,6 @@
+const { default: mongoose } = require("mongoose");
 const ClubDeLecture = require("../models/clubDeLecture"); // Assurez-vous d'avoir importé votre modèle Mongoose
+const Discussion = require('../models/discussion');
 
 
 const ajouterCludLecture = async (req, res) => {
@@ -104,6 +106,28 @@ const ajouterLivreClub = async (req, res) => {
     }
 };
 
+//--------------------------------- Afficher Livre Lus --------------------------------------------------//
+
+const afficherLivresLus = async (req, res) => {
+  try {
+    const clubDeLectureId = req.params.clubDeLectureId;
+
+    // Récupérer le club de lecture par son ID
+    const clubDeLecture = await ClubDeLecture.findById(clubDeLectureId).populate('livres_lus');
+
+    if (!clubDeLecture) {
+      return res.status(404).json({ error: 'Club de lecture non trouvé' });
+    }
+
+    // Récupérer les livres lus dans le club de lecture
+    const livresLus = clubDeLecture.livres_lus;
+
+    res.json({ livresLus });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 //---------------------------------- Supprimer Membre du club ----------------------------------------//
 const supprimerMembreClub = async (req, res) => {
     try {
@@ -143,8 +167,181 @@ const findAndSortClub = async (req, res) => {
     }
 };
   
-  
-  
+ 
+//--------------------------------- Ajouter Discussion au Club --------------------------------------------------//
+const ajouterDiscussionClub = async (req, res) => {
+  try {
+    const clubId = req.params.clubId;
+    const userId = req.params.userId;
+
+    // Vérifier si le club de lecture existe
+    const club = await ClubDeLecture.findById(clubId);
+
+    if (!club) {
+      return res.status(404).json({ error: 'Club de lecture non trouvé' });
+    }
+
+    // Créer une nouvelle discussion
+    const nouvelleDiscussion = new Discussion({
+      titre: req.body.titre,
+      membre: userId,
+      contenu: req.body.contenu,
+      clubAssocie: club._id
+    });
+
+    // Enregistrer la discussion dans le modèle "Discussion"
+    const discussion = await nouvelleDiscussion.save();
+
+    // Ajouter l'ID de la discussion au club de lecture
+    club.discussions.push(discussion._id);
+    await club.save();
+
+    res.json({ message: 'Discussion ajoutée avec succès', discussion });
+  } catch (error) {
+    console.error('Erreur lors de l\'ajout de la discussion au club de lecture :', error);
+    res.status(500).json({ error: 'Une erreur s\'est produite lors de l\'ajout de la discussion au club de lecture' });
+  }
+};
+
+
+// Ajouter une réponse à une discussion dans un club de lecture
+const ajouterReponseDiscussion = async (req, res) => {
+  try {
+    const clubId = req.params.clubId;
+    const discussionId = req.params.discussionId;
+    const membreId = req.params.membreId;
+
+    // Vérifier si le club de lecture existe
+    const club = await ClubDeLecture.findById(clubId);
+
+    if (!club) {
+      return res.status(404).json({ error: 'Club de lecture non trouvé' });
+    }
+
+    // Vérifier si la discussion existe dans le club de lecture
+    const discussion = await Discussion.findOne({ _id: discussionId, clubAssocie: club._id });
+
+    if (!discussion) {
+      return res.status(404).json({ error: 'Discussion non trouvée dans le club de lecture' });
+    }
+
+    // Vérifier la validité de l'ID du membre
+    if (!mongoose.isValidObjectId(membreId)) {
+      return res.status(400).json({ error: 'ID de membre invalide' });
+    }
+
+    // Créer une nouvelle réponse
+    const nouvelleReponse = {
+      membre: mongoose.Types.ObjectId(membreId),
+      contenu: req.body.contenu
+    };
+
+    // Ajouter la réponse à la discussion
+    discussion.reponses.push(nouvelleReponse);
+    await discussion.save();
+
+    res.json({ message: 'Réponse ajoutée avec succès', discussion });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+
+
+
+
+
+
+
+// Ajouter un membre à une discussion dans un club de lecture
+const ajouterMembreDiscussion = async (req, res) => {
+  try {
+    const clubId = req.params.clubId;
+    const discussionId = req.params.discussionId;
+
+    // Vérifier si le club de lecture existe
+    const club = await ClubDeLecture.findById(clubId);
+
+    if (!club) {
+      return res.status(404).json({ error: 'Club de lecture non trouvé' });
+    }
+
+    // Vérifier si la discussion existe dans le club de lecture
+    const discussion = await Discussion.findOne({ _id: discussionId, clubAssocie: club._id });
+
+    if (!discussion) {
+      return res.status(404).json({ error: 'Discussion non trouvée dans le club de lecture' });
+    }
+
+    // Ajouter le membre à la discussion
+    discussion.membre = req.body.membre;
+    await discussion.save();
+
+    res.json({ message: 'Membre ajouté avec succès à la discussion', discussion });
+  } catch (error) {
+    console.error('Erreur lors de l\'ajout du membre à la discussion :', error);
+    res.status(500).json({ error: 'Une erreur s\'est produite lors de l\'ajout du membre à la discussion' });
+  }
+};
+
+// Fonction pour ajouter un like à une discussion
+const ajouterLikeDiscussion = async (req, res) => {
+  try {
+    const clubId = req.params.clubId;
+    const discussionId = req.params.discussionId;
+
+    const club = await ClubDeLecture.findById(clubId);
+
+    if (!club) {
+      return res.status(404).json({ error: 'Club de lecture non trouvé' });
+    }
+
+    const discussion = await Discussion.findOne({ _id: discussionId, clubAssocie: club._id });
+
+    if (!discussion) {
+      return res.status(404).json({ error: 'Discussion non trouvée dans le club de lecture' });
+    }
+
+    discussion.likes++;
+    await discussion.save();
+
+    res.json({ message: 'Like ajouté avec succès', discussion });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// Fonction pour ajouter un dislike à une discussion
+const ajouterDislikeDiscussion = async (req, res) => {
+  try {
+    const clubId = req.params.clubId;
+    const discussionId = req.params.discussionId;
+
+    const club = await ClubDeLecture.findById(clubId);
+
+    if (!club) {
+      return res.status(404).json({ error: 'Club de lecture non trouvé' });
+    }
+
+    const discussion = await Discussion.findOne({ _id: discussionId, clubAssocie: club._id });
+
+    if (!discussion) {
+      return res.status(404).json({ error: 'Discussion non trouvée dans le club de lecture' });
+    }
+
+    discussion.dislikes++;
+    await discussion.save();
+
+    res.json({ message: 'Dislike ajouté avec succès', discussion });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+
+
+
+
 
 module.exports = {
     ajouterCludLecture,
@@ -154,6 +351,12 @@ module.exports = {
     supprimerClub,
     ajouterMembreClub,
     ajouterLivreClub,
+    afficherLivresLus,
     supprimerMembreClub,
-    findAndSortClub
+    findAndSortClub,
+    ajouterDiscussionClub,
+    ajouterReponseDiscussion,
+    ajouterMembreDiscussion,
+    ajouterLikeDiscussion,
+    ajouterDislikeDiscussion
 }
