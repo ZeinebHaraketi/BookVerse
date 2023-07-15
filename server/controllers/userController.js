@@ -4,6 +4,8 @@ const multer = require('multer');
 const path = require('path');
 const nodemailer = require('nodemailer');
 const crypto = require('crypto');
+// const faceapi = require('face-api.js');
+// const canvas = require('canvas');
 
 
 
@@ -289,7 +291,28 @@ const logout = (req, res) => {
 
 
 
+//-------------------- Face Detector -------------------------------------------//
+// const FaceDetectorAuth = async (email, avatar) => {
+//   // Chargement des modèles
+//   await faceapi.nets.ssdMobilenetv1.loadFromDisk('../models');
+//   await faceapi.nets.faceRecognitionNet.loadFromDisk('../models');
 
+//   // Recherche de l'utilisateur par email
+//   const user = await User.findOne({ email });
+
+//   if (!user) {
+//     throw new Error('Utilisateur introuvable');
+//   }
+
+//   // Chargement de l'image d'authentification
+//   const authImage = await canvas.loadImage(avatar);
+//   const authDetection = await faceapi.detectSingleFace(authImage).withFaceLandmarks().withFaceDescriptor();
+
+//   // Comparaison des caractéristiques du visage
+//   const isMatch = faceapi.euclideanDistance(authDetection.descriptor, user.faceDescriptor) < 0.5;
+
+//   return isMatch;
+// };
   
   
   

@@ -26,6 +26,8 @@ const queteRouter = require('./routes/quete');
 const clubRouter = require('./routes/club');
 const chapitreRouter = require('./routes/chapitre');
 const adaptationRouter = require('./routes/adaptation');
+const produitsRouter = require('./routes/produits');
+const panierRouter = require('./routes/panier');
 
 
 
@@ -68,6 +70,8 @@ mongoose.connect(dbURI, { useNewUrlParser: true, useUnifiedTopology: true })
   app.use('/club', clubRouter);
   app.use('/chapitre', chapitreRouter);
   app.use('/adaptation', adaptationRouter);
+  app.use('/produit', produitsRouter);
+  app.use('/cart', panierRouter);
 
 
 
