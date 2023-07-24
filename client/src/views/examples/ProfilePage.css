@@ -1,0 +1,40 @@
+.profile-page {
+    background-color: #1b1b1b;
+    padding-top: 50px;
+  }
+  
+  .gamer-card {
+    background-color: #383838;
+    color: #fff;
+    border: 2px solid #623ffb;
+  }
+  
+  .gamer-card .avatar img {
+    max-width: 150px;
+    border-radius: 50%;
+    border: 5px solid #623ffb;
+    margin: 0 auto;
+    display: block;
+    margin-bottom: 20px;
+  }
+  
+  .gamer-card h3,
+  .gamer-card h5 {
+    text-align: center;
+  }
+  
+  .gamer-card hr {
+    border-color: #692bef;
+    margin: 15px 0;
+  }
+  
+  .gamer-card h5.text-muted {
+    font-weight: normal;
+    margin-top: 0;
+  }
+  
+  .gamer-card h5.text-muted::before {
+    content: '|';
+    margin-right: 10px;
+  }
+  

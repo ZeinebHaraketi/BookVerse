@@ -4,7 +4,13 @@ const mongoose = require('mongoose');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
+const cors = require('cors');
 
+
+
+//Google
+const GoogleStrategy = require('passport-google-oauth20').Strategy;
+const session = require('express-session');
 //Facebook
 const passport = require('passport');
 const FacebookStrategy = require('passport-facebook').Strategy;
@@ -28,6 +34,7 @@ const chapitreRouter = require('./routes/chapitre');
 const adaptationRouter = require('./routes/adaptation');
 const produitsRouter = require('./routes/produits');
 const panierRouter = require('./routes/panier');
+const googleRouter = require('./routes/google');
 
 
 
@@ -40,6 +47,14 @@ app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
+app.use(cors({
+  origin: ['http://localhost:3000'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'HEAD', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Origin', 'X-Requested-With', 'Accept', 'x-client-key', 'x-client-token', 'x-client-secret', 'Authorization', 'x-auth-token'],
+  credentials: true
+
+}));
+
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', usersRouter);
@@ -72,6 +87,7 @@ mongoose.connect(dbURI, { useNewUrlParser: true, useUnifiedTopology: true })
   app.use('/adaptation', adaptationRouter);
   app.use('/produit', produitsRouter);
   app.use('/cart', panierRouter);
+  app.use('/google', googleRouter);
 
 
 
@@ -81,6 +97,111 @@ mongoose.connect(dbURI, { useNewUrlParser: true, useUnifiedTopology: true })
   console.error('Error connecting to database', err);
 });
 
+//------------------------------- Google -------------------------------------------//
+// passport.use(new GoogleStrategy({
+//   clientID: process.env.GOOGLE_CLIENT_ID,
+//   clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+//   callbackURL: process.env.GOOGLE_CALLBACK_URL
+// }, async (accessToken, refreshToken, profile, done) => {
+//   try {
+//     // Vérifiez si l'utilisateur existe dans votre base de données en utilisant l'adresse e-mail Google
+//     let user = await User.findOne({ email: profile.emails[0].value });
+
+//     if (!user) {
+//       // Si l'utilisateur n'existe pas, créez un nouvel utilisateur avec les informations du profil Google
+//       user = new User({
+//         nom: profile.name.familyName,
+//         prenom: profile.name.givenName,
+//         email: profile.emails[0].value,
+//         avatar: profile.photos[0].value,
+//         // Vous pouvez ajouter d'autres champs du modèle User si nécessaire
+//       });
+
+//       await user.save();
+//     }
+
+//     // L'utilisateur est maintenant authentifié et vous pouvez le passer à la fonction "done"
+//     done(null, user);
+//   } catch (err) {
+//     // Gérez les erreurs s'il y en a lors de l'accès à la base de données
+//     done(err);
+//   }
+// }));
+
+// passport.serializeUser((user, done) => {
+//   // Sérialiser l'utilisateur en enregistrant son ID dans la session
+//   done(null, user.id);
+// });
+
+// passport.deserializeUser(async (id, done) => {
+//   try {
+//     // Désérialiser l'utilisateur en recherchant l'utilisateur dans votre base de données à partir de l'ID
+//     const user = await User.findById(id);
+
+//     if (!user) {
+//       // Si l'utilisateur n'est pas trouvé dans la base de données, appelez "done(null, null)" pour indiquer une erreur
+//       return done(null, null);
+//     }
+
+//     // L'utilisateur est trouvé dans la base de données, vous pouvez le passer à la fonction "done"
+//     done(null, user);
+//   } catch (err) {
+//     // Gérez les erreurs s'il y en a lors de l'accès à la base de données
+//     done(err);
+//   }
+// });
+
+// app.use(session({
+//   secret: 'bookverse2023',
+//   resave: true,
+//   saveUninitialized: true
+// }));
+
+// app.use(passport.initialize());
+// app.use(passport.session());
+
+// // Route pour l'authentification avec Google
+// // Définir la route pour démarrer le processus d'authentification avec Google
+// app.get('/auth/google', passport.authenticate('google', {
+//   scope: ['profile', 'email'] // Spécifiez la portée pour accéder au profil et à l'adresse e-mail de l'utilisateur
+// }));
+
+
+// // Callback de l'authentification Google
+// app.get('/auth/google/callback',
+//   passport.authenticate('google', { 
+//     successRedirect: '/welcome', // Rediriger l'utilisateur vers la page de réussite après l'authentification réussie
+//     failureRedirect: '/logout' 
+//   }),
+//   (req, res) => {
+//     // Redirection après l'authentification réussie
+//     res.redirect('/welcome'); // Remplacez par l'URL de la page que vous souhaitez afficher après l'authentification réussie
+//   }
+// );
+
+// console.log(passport.authenticate('google', { 
+//   successRedirect: '/welcome', // Rediriger l'utilisateur vers la page de réussite après l'authentification réussie
+//   failureRedirect: '/logout' 
+// }),);
+
+// // Route pour la déconnexion de l'utilisateur
+// app.get('/logout', (req, res) => {
+//   // Déconnectez l'utilisateur et redirigez-le vers la page d'accueil ou une autre page après la déconnexion
+//   req.logout();
+//   res.redirect('/');
+// });
+
+// // Route pour la page d'accueil
+// app.get('/', (req, res) => {
+//   res.send('Bienvenue sur la page d\'accueil !');
+// });
+
+// // Route pour la page de bienvenue après l'authentification réussie
+// app.get('/welcome', (req, res) => {
+//   // L'utilisateur est authentifié avec succès, vous pouvez accéder à ses informations via "req.user"
+//   console.log(req.user);
+//   res.send('Bienvenue ! Vous êtes maintenant connecté.');
+// });
 
 //------------------------- Facebook -------------------------------------------------//
 // passport.use(new FacebookStrategy({

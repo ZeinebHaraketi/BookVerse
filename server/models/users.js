@@ -20,10 +20,6 @@ const userSchema = new mongoose.Schema({
     livres_lus: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Livre' }],
     critiques_faits: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Critique' }],
     faceDescriptor: { type: Array },
-
-
-
-
 });
 
 const User = mongoose.model('User', userSchema);
