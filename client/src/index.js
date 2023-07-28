@@ -34,6 +34,8 @@ import LoginPage from "views/examples/LoginPage";
 import ResetPasswordPage from "views/examples/ResetPassword";
 
 import '@fortawesome/fontawesome-free/css/all.min.css';
+import ProfilePageAdmin from "views/examples/ProfilePageAdmin";
+import ProfilePageModerateur from "views/examples/ProfilePageModerateur";
 
 
 // others
@@ -47,12 +49,16 @@ root.render(
       <Route path="/nucleo-icons" element={<NucleoIcons />} />
       <Route path="/landing-page" element={<LandingPage />} />
       <Route path="/profile/:id" element={<ProfilePage />} />
-      <Route path="/register-page" element={<RegisterPage />} />
+      <Route path="/admin/profile/:id" element={<ProfilePageAdmin />} />
+      <Route path="/moderateur/profile/:id" element={<ProfilePageModerateur />} />
+
+
+      <Route path="/register" element={<RegisterPage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/resetPassword/:token" element={<ResetPasswordPage />} />
 
 
-      <Route path="*" element={<Navigate to="/index" replace />} />
+      <Route path="*" element={<Navigate to="/login" replace />} />
     </Routes>
   </BrowserRouter>
 );

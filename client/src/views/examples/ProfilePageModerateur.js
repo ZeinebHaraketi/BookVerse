@@ -55,7 +55,7 @@ import {
   faUser,
 } from "@fortawesome/free-solid-svg-icons";
 
-function ProfilePage() {
+function ProfilePageModerateur() {
   const [activeTab, setActiveTab] = React.useState("1");
   // const [user, setUser] = useState(null);
   const { userId } = useParams();
@@ -68,7 +68,6 @@ function ProfilePage() {
   const [nom, setNom] = useState("");
   const [email, setEmail] = useState("");
   // State to track form input values
-  const [interets, setInterets] = useState("");
   const [niveau, setNiveau] = useState("");
 
   const toggle = (tab) => {
@@ -111,8 +110,6 @@ function ProfilePage() {
       prenom,
       nom,
       email,
-      interets: interets.split(',').map((interest) => interest.trim()), // Convert interests to an array
-      niveau,
     };
 
     try {
@@ -164,20 +161,13 @@ function ProfilePage() {
                   <FontAwesomeIcon icon={faUser} className="user-icon" />
                   {user.nom} {user.prenom}
                 </h3>
-                <h5 className="text-muted">
-                  <FontAwesomeIcon icon={faStar} className="level-icon" />
-                  Level {user.niveau}
-                </h5>
+               
                 <hr />
                 <h5>
                   <FontAwesomeIcon icon={faEnvelope} className="email-icon" />
                   Email: {user.email}
                 </h5>
-                {/* Add more user information here as needed */}
-                <h5>
-      <FontAwesomeIcon icon={faCoffee} className="interests-icon" />
-      Interests: {user.interets ? user.interets.join(', ') : 'No interests found'}
-    </h5>
+                
               </CardBody>
                {/* Conditional rendering for the edit form */}
 
@@ -212,25 +202,7 @@ function ProfilePage() {
                   onChange={(e) => setEmail(e.target.value)}
                 />
               </FormGroup>
-              <FormGroup>
-                <Label for="interets">Interets</Label>
-                <Input
-                  type="text"
-                  id="interets"
-                  value={interets}
-                  onChange={(e) => setInterets(e.target.value)}
-                />
-              </FormGroup>
-
-              <FormGroup>
-                <Label for="niveau">Niveau</Label>
-                <Input
-                  type="number"
-                  id="niveau"
-                  value={niveau}
-                  onChange={(e) => setNiveau(e.target.value)}
-                />
-              </FormGroup>
+              
 
               <Button type="submit" color="primary">
                 Save
@@ -246,78 +218,10 @@ function ProfilePage() {
           </Col>
         </Row>
       </Container>
-      {/* <div className="section profile-content">
-        <Container>
-        {user ? (
-          <div className="owner">
-            <div className="avatar">
-              <img
-                alt="..."
-                className="img-circle img-no-padding img-responsive"
-                src={user.avatar}
-                // src={require("assets/img/faces/joe-gardner-2.jpg")}
-              />
-            </div>
-
-            <div className="name">
-              <h4 className="title">
-              {user.nom} {user.prenom}<br />
-              </h4>
-            </div>
-            <p > <strong>{user.email} </strong> </p>
-          </div>
-        ): (
-          <p>Loading...</p>
-        )}
-          <Row>
-            <Col className="ml-auto mr-auto text-center" md="6">
-              <p>
-                An artist of considerable range, Jane Faker — the name taken by
-                Melbourne-raised, Brooklyn-based Nick Murphy — writes, performs
-                and records all of his own music, giving it a warm, intimate
-                feel with a solid groove structure.
-              </p>
-              <br />
-              <Button className="btn-round" color="default" outline>
-                <i className="fa fa-cog" /> Settings
-              </Button>
-            </Col>
-          </Row>
-          <br />
-          <div className="nav-tabs-navigation">
-            <div className="nav-tabs-wrapper">
-              <Nav role="tablist" tabs>
-                <NavItem>
-                  <NavLink
-                    className={activeTab === "1" ? "active" : ""}
-                    onClick={() => {
-                      toggle("1");
-                    }}
-                  >
-                    Follows
-                  </NavLink>
-                </NavItem>
-                <NavItem>
-                  <NavLink
-                    className={activeTab === "2" ? "active" : ""}
-                    onClick={() => {
-                      toggle("2");
-                    }}
-                  >
-                    Following
-                  </NavLink>
-                </NavItem>
-              </Nav>
-            </div>
-          </div>
-       
-        </Container>
-      </div> */}
-
-     
+    
       <DemoFooter />
     </>
   );
 }
 
-export default ProfilePage;
+export default ProfilePageModerateur;

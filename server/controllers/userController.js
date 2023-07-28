@@ -61,8 +61,10 @@ const login = async (req, res) => {
       // Génération du jeton d'authentification
       const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET);
   
+      const role = user.role; // Assuming the role is stored in the 'role' field of the user document
+
       // Réponse avec le jeton d'authentification
-      res.json({ token,  userId: user._id });
+      res.json({ token,  userId: user._id, role});
     } catch (error) {
       console.error(error);
       res.status(500).json({ message: 'Une erreur est survenue lors de la connexion.' });
@@ -96,6 +98,8 @@ const transporter = nodemailer.createTransport({
   const register = async (req, res) => {
   
       const { nom, prenom, email, password } = req.body;
+      const role = req.query.role;
+
   
       try {
         // Vérification si l'utilisateur existe déjà
@@ -116,6 +120,7 @@ const transporter = nodemailer.createTransport({
           nom,
           prenom,
           email,
+          role,
           password: hashedPassword,
           avatar: result.secure_url // Stockez l'URL sécurisée de l'image de Cloudinary dans le champ 'image' du livre
 
@@ -284,6 +289,28 @@ const authMiddleware = (req, res, next) => {
 
 
 
+// Update the user profile information
+const updateProfile = async (req, res) => {
+  try {
+    const { prenom, nom, email, interets, niveau } = req.body;
+    const userId = req.params.id;
+
+    const user = await User.findByIdAndUpdate(
+      userId,
+      { prenom, nom, email, interets, niveau },
+      { new: true }
+    ).select('-password');
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found.' });
+    }
+
+    res.json(user);
+  } catch (error) {
+    console.error('Error updating user profile:', error);
+    res.status(500).json({ message: 'Error updating user profile.' });
+  }
+};
 
 
 
@@ -312,5 +339,5 @@ const authMiddleware = (req, res, next) => {
   
   
   
-  module.exports = { login, register, forgetPassword,  reset_password, logout, authMiddleware };
+  module.exports = { login, register, forgetPassword,  reset_password, logout, authMiddleware, updateProfile };
   

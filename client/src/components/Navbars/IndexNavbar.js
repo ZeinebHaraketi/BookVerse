@@ -16,7 +16,7 @@
 * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
 */
-import React from "react";
+import React, { useState } from "react";
 // nodejs library that concatenates strings
 import classnames from "classnames";
 // reactstrap components
@@ -30,10 +30,18 @@ import {
   Nav,
   Container,
 } from "reactstrap";
+import RoleSelectionModal from "views/examples/RoleSelectionModal";
 
 function IndexNavbar() {
   const [navbarColor, setNavbarColor] = React.useState("navbar-transparent");
   const [navbarCollapse, setNavbarCollapse] = React.useState(false);
+
+  const [showRoleSelection, setShowRoleSelection] = useState(false);
+  const [selectedRole, setSelectedRole] = useState('');
+
+  const handleRoleSelection = () => {
+    setShowRoleSelection(true);
+  };
 
   const toggleNavbarCollapse = () => {
     setNavbarCollapse(!navbarCollapse);
@@ -124,17 +132,7 @@ function IndexNavbar() {
                 <p className="d-lg-none">Instagram</p>
               </NavLink>
             </NavItem>
-            <NavItem>
-              <NavLink
-                data-placement="bottom"
-                href="https://www.github.com/CreativeTimOfficial/paper-kit-react?ref=creativetim"
-                target="_blank"
-                title="Star on GitHub"
-              >
-                <i className="fa fa-github" />
-                <p className="d-lg-none">GitHub</p>
-              </NavLink>
-            </NavItem>
+            
             <NavItem>
               <NavLink
                 href="https://demos.creative-tim.com/paper-kit-react/#/documentation?ref=pkr-index-navbar"
@@ -147,12 +145,18 @@ function IndexNavbar() {
               <Button
                 className="btn-round"
                 color="danger"
-                href="https://www.creative-tim.com/product/paper-kit-pro-react?ref=pkr-index-navbar"
-                target="_blank"
+                onClick={handleRoleSelection}
               >
-                <i className="nc-icon nc-spaceship"></i> Upgrade to Pro
+                <i className="nc-icon nc-spaceship"></i> Register
               </Button>
             </NavItem>
+            {showRoleSelection && (
+        <RoleSelectionModal
+          selectedRole={selectedRole}
+          setSelectedRole={setSelectedRole}
+          setShowRoleSelection={setShowRoleSelection}
+        />
+      )}
           </Nav>
         </Collapse>
       </Container>

@@ -1,5 +1,5 @@
 var express = require('express');
-const { register,login, logout, forgetPassword, reset_password, FaceDetectorAuth, authMiddleware } = require('../controllers/userController');
+const { register,login, logout, forgetPassword, reset_password, FaceDetectorAuth, authMiddleware, updateProfile } = require('../controllers/userController');
 var router = express.Router();
 
 const multer = require('multer');
@@ -27,11 +27,18 @@ const storage = new CloudinaryStorage({
 const upload = multer({ storage: storage });
 
 /* GET users listing. */
+// router.post('/register',upload.single('avatar'), register);
 router.post('/register',upload.single('avatar'), register);
+
 router.post('/login',login);
 router.post('/forgetPassword', forgetPassword);
 router.post('/resetPassword/:token', reset_password);
 router.get('/logout', logout);
+
+router.get("/login", async (req, res) => {
+  res.status(200).json({ Message: "bonjour" });
+});
+
 
 // Route to get user profile
 router.get('/profile', authMiddleware, async (req, res) => {
@@ -85,5 +92,10 @@ router.post('/auth/face', async (req, res) => {
       res.status(500).json({ message: 'Erreur lors de l\'authentification', error: err.message });
     }
 });
+
+
+// Update the user profile information
+// router.put('/mod/profile', authMiddleware, updateProfile);
+router.put('/mod/profile/:id', updateProfile);
 
 module.exports = router;

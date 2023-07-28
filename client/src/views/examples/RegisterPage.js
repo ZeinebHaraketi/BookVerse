@@ -16,7 +16,7 @@
 * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
 */
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 // reactstrap components
 import { Button, Card, Form, Input, Container, Row, Col } from "reactstrap";
@@ -27,6 +27,7 @@ import axios from "axios";
 import { API } from "api_server";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 
 function RegisterPage() {
   document.documentElement.classList.remove("nav-open");
@@ -45,6 +46,15 @@ function RegisterPage() {
   const [password, setPassword] = useState("");
   const [email, setEmail] = useState("");
   const [avatar, setAvatar] = useState(null);
+  // const { role } = useParams();
+
+
+  // const role = localStorage.getItem("userRole");
+
+  // useEffect(() => {
+  //   // Set the role from the URL parameter to the state
+  //   setUserRole(role);
+  // }, [role]);
 
 
   const [errors, setErrors] = useState({});
@@ -53,12 +63,15 @@ function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false); // State to toggle show/hide password
 
 
-  // Function to handle the drag and drop event
+  // const location = useLocation();
+  // const searchParams = new URLSearchParams(location.search);
+  // const role = searchParams.get('role');
+  // const [userRole, setUserRole] = useState('');
 
-
-  const handleAvatarSelect = (avatar) => {
-    setAvatar(avatar);
-  };
+  // useEffect(() => {
+  //   const storedUserRole = localStorage.getItem('userRole');
+  //   setUserRole(storedUserRole || role);
+  // }, [role]);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -69,6 +82,9 @@ function RegisterPage() {
     formData.append("email", email);
     formData.append("password", password);
     formData.append("avatar", avatar); // Assuming 'avatar' is the File object selected by the user
+    // formData.append("role", userRole);
+
+    // console.log(role);
 
     try {
       const response = await axios.post(`${API}/register`, formData, {
@@ -92,9 +108,11 @@ function RegisterPage() {
     }
   };
 
+  const navigate = useNavigate();
 
-  
-
+  const handleLoginClick = () => {
+    navigate('/login');
+  };
  
 
   return (
@@ -187,6 +205,9 @@ function RegisterPage() {
                   type="file" 
                   onChange={(e) => setAvatar(e.target.files[0])}
                   />
+
+{/* <p>Selected Role: {userRole}</p> */}
+
                  
 
                   <Button block className="btn-round" color="danger">
@@ -198,10 +219,9 @@ function RegisterPage() {
                   <Button
                     className="btn-link"
                     color="danger"
-                    href="#pablo"
-                    onClick={(e) => e.preventDefault()}
+                    onClick={handleLoginClick}
                   >
-                    Forgot password?
+                    do You have An Account? {' '}
                   </Button>
                 </div>
               </Card>

@@ -1,34 +1,16 @@
-/*!
 
-=========================================================
-* Paper Kit React - v1.3.2
-=========================================================
+import React, { useEffect, useState } from "react";
 
-* Product Page: https://www.creative-tim.com/product/paper-kit-react
+import { Button, Card, Form, Input, Container, Row, Col, CustomInput, FormGroup, InputGroupAddon } from "reactstrap";
 
-* Copyright 2023 Creative Tim (https://www.creative-tim.com)
-* Licensed under MIT (https://github.com/creativetimofficial/paper-kit-react/blob/main/LICENSE.md)
-
-* Coded by Creative Tim
-
-=========================================================
-
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-*/
-import React, { useState } from "react";
-
-// reactstrap components
-import { Button, Card, Form, Input, Container, Row, Col } from "reactstrap";
-
-// core components
 import ExamplesNavbar from "components/Navbars/ExamplesNavbar.js";
 import axios from "axios";
 import { API } from "api_server";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 
 function LoginPage() {
-
   document.documentElement.classList.remove("nav-open");
   React.useEffect(() => {
     document.body.classList.add("register-page");
@@ -39,37 +21,112 @@ function LoginPage() {
 
   const [password, setPassword] = useState("");
   const [email, setEmail] = useState("");
-  const [userId, setUserId] = useState('');
+  const [userId, setUserId] = useState("");
 
 
-  const [showAlert, setShowAlert] = useState(false);
-  const [alertMessage, setAlertMessage] = useState("");
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
+
+  const [rememberMe, setRememberMe] = useState(false); // État pour le statut "Remember Me"
+
+  const [showPassword, setShowPassword] = useState(false);
+
   const navigate = useNavigate(); // Initialize the useNavigate hook
 
-
+  const handleRememberMeChange = (e) => {
+    setRememberMe(e.target.checked);
+  };
 
   const handleLogin = async (event) => {
     event.preventDefault();
-
+  
+    if (rememberMe) {
+      localStorage.setItem("rememberedEmail", email);
+    } else {
+      localStorage.removeItem("rememberedEmail");
+    }
+  
     try {
       const response = await axios.post(`${API}/login`, { email, password });
-
-      // If login is successful, store the token in local storage
-      const { token, userId } = response.data;
+  
+      const { token, userId, role } = response.data;
+  
+      if (!role) {
+        // If the role is missing in the response, handle the error
+        setError("Le rôle de l'utilisateur n'a pas été renvoyé par le serveur.");
+        return;
+      }
+  
       setUserId(userId);
-
-      localStorage.setItem('token', token);
-
-       // Redirect to the profile page
-       navigate(`/profile/${userId}`);
-      // Redirect to the next page or perform other actions
-      console.log('Login successful!');
+      console.log("Extracted role:", role);
+      localStorage.setItem("token", token);
+      localStorage.setItem("role", role);
+  
+      if (role === "admin") {
+        navigate(`/admin/profile/${userId}`);
+      } else if (role === "moderateur") {
+        navigate(`/moderateur/profile/${userId}`);
+      } else {
+        navigate(`/profile/${userId}`);
+      }
+  
+      console.log("Login successful!");
     } catch (error) {
-      // Handle login errors
-      setError(error.response?.data?.message || 'Une erreur est survenue lors de la connexion.');
+      setError(
+        error.response?.data?.message ||
+          "Une erreur est survenue lors de la connexion."
+      );
     }
   };
+  
+  // const handleLogin = async (event) => {
+  //   event.preventDefault();
+
+  //   if (rememberMe) {
+  //     // Si "Remember Me" est coché, enregistrez le nom d'utilisateur / email dans le localStorage
+  //     localStorage.setItem("rememberedEmail", email);
+  //   } else {
+  //     // Sinon, supprimez le nom d'utilisateur / email du localStorage s'il existe
+  //     localStorage.removeItem("rememberedEmail");
+  //   }
+
+  //   try {
+  //     const response = await axios.post(`${API}/login`, { email, password });
+
+  //     const { token, userId, role } = response.data;
+  //     setUserId(userId);
+
+  //     console.log("Extracted role:", role); // Log the extracted role
+
+  //     localStorage.setItem("token", token);
+  //     localStorage.setItem("role", role);
+
+
+  //   if (role === "admin") {
+  //     navigate(`/admin/profile/${userId}`);
+  //   } else if (role === "moderateur") {
+  //     navigate(`/moderateur/profile/${userId}`);
+  //   } else {
+  //     navigate(`/profile/${userId}`);
+  //   }
+  //     // Redirect to the profile page
+  //     // navigate(`/profile/${userId}`);
+  //     // Redirect to the next page or perform other actions
+  //     console.log("Login successful!");
+  //   } catch (error) {
+  //     setError(
+  //       error.response?.data?.message ||
+  //         "Une erreur est survenue lors de la connexion."
+  //     );
+  //   }
+  // };
+
+  useEffect(() => {
+    const rememberedEmail = localStorage.getItem("rememberedEmail");
+    if (rememberedEmail) {
+      setEmail(rememberedEmail);
+      setRememberMe(true);
+    }
+  }, []);
 
   const handleForgetPassword = async () => {
     try {
@@ -147,10 +204,28 @@ function LoginPage() {
                   <label>Password</label>
                   <Input
                     placeholder="Entrer votrePassword"
-                    type="password"
+          type={showPassword ? 'text' : 'password'}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                   />
+                   <InputGroupAddon addonType="append">
+          <Button
+            color="link"
+            onClick={() => setShowPassword((prevShowPassword) => !prevShowPassword)}
+          >
+            <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} /> Show Password
+          </Button>
+        </InputGroupAddon>
+
+<FormGroup>
+        <CustomInput
+          type="checkbox"
+          id="rememberMe"
+          label="Remember Me"
+          checked={rememberMe}
+          onChange={(e) => setRememberMe(e.target.checked)}
+        />
+      </FormGroup>
 
                   <Button block className="btn-round" color="danger">
                     Login
