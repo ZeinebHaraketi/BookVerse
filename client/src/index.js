@@ -36,6 +36,9 @@ import ResetPasswordPage from "views/examples/ResetPassword";
 import '@fortawesome/fontawesome-free/css/all.min.css';
 import ProfilePageAdmin from "views/examples/ProfilePageAdmin";
 import ProfilePageModerateur from "views/examples/ProfilePageModerateur";
+import AfficherLivres from "views/examples/Livres/AfficherLivres";
+import DetailsLivres from "views/examples/Livres/DetailsLivres";
+import LectureLivre from "views/examples/Livres/LectureLivre";
 
 
 // others
@@ -56,6 +59,13 @@ root.render(
       <Route path="/register" element={<RegisterPage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/resetPassword/:token" element={<ResetPasswordPage />} />
+
+
+      <Route path="/livres" element={<AfficherLivres />} />
+      <Route path="/detailsLivre/:id" element={<DetailsLivres />} />
+      <Route path="/lecture-livre/:livreId/chapitre/:chapitreId"  element={<LectureLivre />}/>
+
+
 
 
       <Route path="*" element={<Navigate to="/login" replace />} />

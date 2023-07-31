@@ -1,5 +1,5 @@
 var express = require('express');
-const { register,login, logout, forgetPassword, reset_password, FaceDetectorAuth, authMiddleware, updateProfile } = require('../controllers/userController');
+const { register,login, logout, forgetPassword, reset_password, FaceDetectorAuth, authMiddleware, updateProfile, getUserReadBooks, addBookToLibrary } = require('../controllers/userController');
 var router = express.Router();
 
 const multer = require('multer');
@@ -38,6 +38,11 @@ router.get('/logout', logout);
 router.get("/login", async (req, res) => {
   res.status(200).json({ Message: "bonjour" });
 });
+
+// Route to fetch read books for a user
+router.get('/user/:userId/read-books', getUserReadBooks);
+// Route to add books to the user's library
+router.post('/user/:userId/add-book', addBookToLibrary);
 
 
 // Route to get user profile

@@ -156,6 +156,62 @@ const modifierLivre = async (req, res) => {
 };
 
 //---------------------------------------- Recherche Multi-Critère ------------------------------------------//
+// const rechercheLivres = async (req, res) => {
+//   try {
+//     const {
+//       genre,
+//       categorie,
+//       auteur,
+//       titre,
+//       anneePublication,
+//       adaptationsCinematographiques,
+//       adaptationsJeuxVideo,
+//       note
+//     } = req.query;
+
+//     const criteresRecherche = {};
+
+//     if (genre) {
+//       criteresRecherche.genre = genre;
+//     }
+
+//     if (categorie) {
+//       criteresRecherche.categorie = categorie;
+//     }
+
+//     if (auteur) {
+//       criteresRecherche.auteur = auteur;
+//     }
+
+//     if (titre) {
+//       criteresRecherche.titre = { $regex: titre, $options: 'i' };
+//     }
+
+//     if (anneePublication) {
+//       criteresRecherche.anneePublication = anneePublication;
+//     }
+
+//     if (adaptationsCinematographiques) {
+//       criteresRecherche.adaptationsCinematographiques = adaptationsCinematographiques;
+//     }
+
+//     if (adaptationsJeuxVideo) {
+//       criteresRecherche.adaptationsJeuxVideo = adaptationsJeuxVideo;
+//     }
+
+//     if (note) {
+//       criteresRecherche.note = note;
+//     }
+
+//     const livres = await Livre.find({ $and: [criteresRecherche] });
+
+//     res.json(livres);
+//   } catch (error) {
+//     res.status(500).json({ error: error.message });
+//   }
+// };
+// Node.js code
+// Node.js code
 const rechercheLivres = async (req, res) => {
   try {
     const {
@@ -166,50 +222,58 @@ const rechercheLivres = async (req, res) => {
       anneePublication,
       adaptationsCinematographiques,
       adaptationsJeuxVideo,
-      note
+      note,
     } = req.query;
 
-    const criteresRecherche = {};
+    // Create an array to store individual queries
+    const queries = [];
 
+    // Build the query for each search parameter if it exists
     if (genre) {
-      criteresRecherche.genre = genre;
+      queries.push({ genre });
     }
 
     if (categorie) {
-      criteresRecherche.categorie = categorie;
+      queries.push({ categorie });
     }
 
     if (auteur) {
-      criteresRecherche.auteur = auteur;
+      queries.push({ auteur });
     }
 
     if (titre) {
-      criteresRecherche.titre = { $regex: titre, $options: 'i' };
+      queries.push({ titre: { $regex: titre, $options: "i" } });
     }
 
     if (anneePublication) {
-      criteresRecherche.anneePublication = anneePublication;
+      queries.push({ anneePublication });
     }
 
     if (adaptationsCinematographiques) {
-      criteresRecherche.adaptationsCinematographiques = adaptationsCinematographiques;
+      queries.push({ adaptationsCinematographiques });
     }
 
     if (adaptationsJeuxVideo) {
-      criteresRecherche.adaptationsJeuxVideo = adaptationsJeuxVideo;
+      queries.push({ adaptationsJeuxVideo });
     }
 
     if (note) {
-      criteresRecherche.note = note;
+      queries.push({ note });
     }
 
-    const livres = await Livre.find({ $and: [criteresRecherche] });
+    // Combine individual queries using "$or" to perform an "OR" operation
+    const combinedQuery = { $or: queries };
+
+    const livres = await Livre.find(combinedQuery);
 
     res.json(livres);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
+
+
+
 
 //---------------------------------------- Tri Multi-Critère NE MARCHE PAS ------------------------------------------//
 const triLivres  =  async (req, res) => {
@@ -343,6 +407,83 @@ const supprimerChapitreLivre = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+//------------------------------------- Lire un chapitre bien spécifique dans un Livre --------------------------------------------//
+
+// Endpoint to read a specific chapter of a book by its Livre ID and Chapitre ID
+// const LectureLivre =  async (req, res) => {
+//   const { livreId, chapitreId } = req.params;
+
+//   try {
+//     // Find the book by its Livre ID and retrieve the Chapitre with the given Chapitre ID
+//     const livre = await Livre.findById(livreId);
+
+//     if (!livre) {
+//       return res.status(404).json({ message: "Livre not found" });
+//     }
+
+//     // Find the specific chapitre by its Chapitre ID within the Livre
+//     const chapitre = livre.chapitres.find(
+//       (chapitre) => chapitre._id.toString() === chapitreId
+//     );
+
+//     if (!chapitre) {
+//       return res.status(404).json({ message: "Chapitre not found" });
+//     }
+
+//     // Assuming you have a property called "contenu" in your Chapitre model that contains the chapter content
+//     const chapitreContent = chapitre.contenu;
+
+//     res.status(200).json({ contenu: chapitreContent });
+//   } catch (error) {
+//     res.status(500).json({ message: error.message });
+//   }
+// }
+const LectureLivre = async (req, res) => {
+  const { livreId, chapitreId } = req.params;
+
+  try {
+    // Find the book by its Livre ID and retrieve the Chapitre with the given Chapitre ID
+    const livre = await Livre.findById(livreId);
+
+    if (!livre) {
+      return res.status(404).json({ message: "Livre not found" });
+    }
+
+    // Find the specific chapitre by its Chapitre ID within the Livre
+    const chapitre = livre.chapitres.find(
+      (chapitre) => chapitre._id.toString() === chapitreId
+    );
+
+    if (!chapitre) {
+      return res.status(404).json({ message: "Chapitre not found" });
+    }
+
+    // Assuming you have a property called "contenu" in your Chapitre model that contains the chapter content
+    const chapitreContent = chapitre.contenu;
+
+    res.status(200).json({ contenu: chapitreContent });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+
+// Supposons que vous avez un modèle 'Chapitre' dans votre fichier modèle
+
+const getChapitresByTitre = async (req, res) => {
+  const { id } = req.params; // Supposons que vous passez l'ID du livre dans les paramètres de l'URL
+
+  try {
+    // Utilisez la méthode find de Mongoose pour récupérer les chapitres du livre par leur titre, triés par ordre alphabétique
+    const chapitres = await Chapitre.find({ livreId: id }).sort({ titre: 1 });
+
+    res.status(200).json(chapitres);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 
 //------------------------------------- Ajouter une Adaptation dans un Livre --------------------------------------------//
 const ajouterAdaptationLivre = async (req, res) => {
@@ -561,6 +702,8 @@ const supprimerCritiqueLivre = async (req, res) => {
 };
 
 
+
+
 module.exports = {
     getLivres,
     getLivre,
@@ -572,12 +715,15 @@ module.exports = {
     ajouterChapitreLivre,
     modifierChapitreLivre,
     supprimerChapitreLivre,
+    getChapitresByTitre,
+    LectureLivre,
     ajouterAdaptationLivre,
     //modifierAdaptationLivre,
     supprimerAdaptationLivre,
     ajouterCritiqueLivre,
     modifierCritiqueLivre,
-    supprimerCritiqueLivre
+    supprimerCritiqueLivre,
+    
 }
 
   

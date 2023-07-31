@@ -15,6 +15,7 @@ const livreSchema = new mongoose.Schema({
     ref: 'Critique',
     default: [] },
   note: { type: Number,min: 0,max: 5},
+  nbVus: { type: Number,min: 0},
   avis: { type: String }
 });
 

@@ -70,6 +70,8 @@ function ProfilePage() {
   // State to track form input values
   const [interets, setInterets] = useState("");
   const [niveau, setNiveau] = useState("");
+  const [readBooks, setReadBooks] = useState([]);
+
 
   const toggle = (tab) => {
     if (activeTab !== tab) {
@@ -129,6 +131,22 @@ function ProfilePage() {
     setIsOpen(false);
 
   };
+
+  useEffect(() => {
+    // Fetch the user's read books from the backend API
+    const fetchReadBooks = async () => {
+      try {
+        const response = await axios.get(`${API}/user/${userId}/read-books`);
+        setReadBooks(response.data);
+      } catch (error) {
+        console.error("Error fetching read books:", error);
+      }
+    };
+
+    // Assuming you have the user ID available, you can use it here.
+    // Replace 'userId' with the actual user ID.
+    fetchReadBooks();
+  }, []);
 
   return (
     <>
@@ -314,7 +332,14 @@ function ProfilePage() {
         </Container>
       </div> */}
 
-     
+<div>
+      <h2>Bibliothèque</h2>
+      <ul>
+        {readBooks.map((book) => (
+          <li key={book._id}>{book.titre}</li>
+        ))}
+      </ul>
+    </div>
       <DemoFooter />
     </>
   );

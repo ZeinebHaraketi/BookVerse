@@ -16,6 +16,7 @@ const userSchema = new mongoose.Schema({
     historiqueLecture: { type: [String] },
     historiqueAchat: { type: [String] },
     clubLecture: {type: mongoose.Schema.Types.ObjectId, ref: 'ClubDeLecture' },
+    librairie: {type: mongoose.Schema.Types.ObjectId, ref: 'Librairie' },
     discussions: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Discussion' }],
     livres_lus: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Livre' }],
     critiques_faits: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Critique' }],

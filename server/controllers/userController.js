@@ -313,6 +313,50 @@ const updateProfile = async (req, res) => {
 };
 
 
+//------------------------------------- Afficher Livre Lus par le User -------------------------------------------//
+const getUserReadBooks = async (req, res) => {
+  const { userId } = req.params;
+
+  try {
+    // Find the user by their ID
+    const user = await User.findById(userId);
+    
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Fetch the read books using the readBooks field in the User model
+    const readBooks = await Livre.find({ _id: { $in: user.readBooks } });
+
+    res.status(200).json(readBooks);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+//----------------------------- Ajout de Livre à une Librairie -------------------------------//
+const addBookToLibrary = async (req, res) => {
+  const { userId } = req.params;
+  const { livreId } = req.body;
+
+  try {
+    // Find the user by userId
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Add the bookId to the user's library
+    user.librairie.push(livreId);
+    await user.save();
+
+    res.status(200).json({ message: 'Book added to library successfully' });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 
 //-------------------- Face Detector -------------------------------------------//
 // const FaceDetectorAuth = async (email, avatar) => {
@@ -339,5 +383,15 @@ const updateProfile = async (req, res) => {
   
   
   
-  module.exports = { login, register, forgetPassword,  reset_password, logout, authMiddleware, updateProfile };
+  module.exports = { 
+    login, 
+    register, 
+    forgetPassword,  
+    reset_password, 
+    logout, 
+    authMiddleware, 
+    updateProfile,
+    getUserReadBooks,
+    addBookToLibrary
+  };
   

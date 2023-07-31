@@ -1,0 +1,55 @@
+.book-details {
+    background-color: #f9f9f9;
+    padding: 20px 0;
+  }
+  
+  .book-card {
+    background-color: #fff;
+    max-width: 600px;
+    margin: auto;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+  }
+  
+  .book-cover {
+    text-align: center;
+    padding: 20px;
+  }
+  
+  .book-image {
+    max-width: 50px;
+    height: auto;
+    border-radius: 4px;
+  }
+  
+  .card-body {
+    padding: 20px;
+  }
+  
+  .book-title {
+    font-size: 28px;
+    font-weight: bold;
+    margin-bottom: 10px;
+  }
+  
+  .icon {
+    margin-right: 8px;
+  }
+  
+  .card-subtitle {
+    margin-bottom: 5px;
+  }
+  .book-description {
+    margin-top: 20px;
+    font-size: 18px;
+    line-height: 1.6;
+  }  
+
+  .read-book-button {
+    margin-top: 20px;
+    width: 100%;
+    max-width: 200px;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+  }
