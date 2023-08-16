@@ -14,6 +14,8 @@ require("dotenv").config();
 
 
 const User = require('../models/users');
+const Librairie = require('../models/librairie');
+const Livre = require('../models/livre')
 
 
 
@@ -314,49 +316,232 @@ const updateProfile = async (req, res) => {
 
 
 //------------------------------------- Afficher Livre Lus par le User -------------------------------------------//
+// const getUserReadBooks = async (req, res) => {
+//   const { userId } = req.params;
+
+//   try {
+//     console.log("User ID:", userId);
+
+//     // Find the user by their ID
+//     const user = await User.findById(userId).populate('librairie');
+//     const populatedLibrairie = await Librairie.populate(user.librairie, { path: 'livres' });
+// console.log(populatedLibrairie);
+
+//     console.log("User:", user);
+
+//     if (!user) {
+//       return res.status(404).json({ message: "User not found" });
+//     }
+
+//     // Access the 'livres' array within the 'librairie'
+//     const libraryBooks = user.librairie.livres;
+
+//     // Populate the 'livres' array to get the book documents
+//     const populatedLibraryBooks = await Livre.find({ _id: { $in: libraryBooks } });
+
+//     res.status(200).json(populatedLibraryBooks);
+//   } catch (error) {
+//     console.error("Error:", error);
+//     res.status(500).json({ message: error.message });
+//   }
+// };
 const getUserReadBooks = async (req, res) => {
   const { userId } = req.params;
 
   try {
-    // Find the user by their ID
-    const user = await User.findById(userId);
-    
+    // Find the user by their ID and populate the 'librairie' field
+    const user = await User.findById(userId).populate({ path: 'librairie', populate: { path: 'livres'} });
+
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
 
-    // Fetch the read books using the readBooks field in the User model
-    const readBooks = await Livre.find({ _id: { $in: user.readBooks } });
+    // Check if the 'librairie' field is populated
+    if (!user.librairie) {
+      return res.status(400).json({ message: "User's library is empty" });
+    }
 
-    res.status(200).json(readBooks);
+    // Access the 'livres' array within the 'librairie'
+    const libraryBooks = user.librairie[0].livres; // Assuming you're accessing the first librairie
+
+    // Populate the 'livres' array to get the book documents
+    const populatedLibraryBooks = await Livre.find({ _id: { $in: libraryBooks } });
+
+    res.status(200).json(populatedLibraryBooks);
   } catch (error) {
+    console.error("Error:", error);
     res.status(500).json({ message: error.message });
   }
 };
 
+
+// const getUserReadBooks = async (req, res) => {
+//   const { userId } = req.params;
+
+//   try {
+
+//     // Find the user by their ID and populate the 'librairie' field
+//     const user = await User.findById(userId).populate('librairie');
+
+//     if (!user) {
+//       return res.status(404).json({ message: "User not found" });
+//     }
+
+//     // Check if the 'librairie' field is populated
+//     if (!user.librairie) {
+//       return res.status(400).json({ message: "User's library is empty" });
+//     }
+
+//     // Access the 'livres' array within the 'librairie'
+//     const libraryBooks = user.librairie.livres;
+
+//     console.log("Library Books:", libraryBooks);
+//     console.log("User's Library:", user.librairie);
+
+
+//     // Check if there are any books in the library
+//     // if (!libraryBooks || libraryBooks.length === 0) {
+//     //   return res.status(400).json({ message: "User's library has no books" });
+//     // }
+
+//     // Populate the 'livres' array to get the book documents
+//     const populatedLibraryBooks = await Livre.find({ _id: { $in: libraryBooks } });
+
+//     res.status(200).json(populatedLibraryBooks);
+//   } catch (error) {
+//     console.error("Error:", error);
+//     res.status(500).json({ message: error.message });
+//   }
+// };
+
+
 //----------------------------- Ajout de Livre à une Librairie -------------------------------//
+
 const addBookToLibrary = async (req, res) => {
   const { userId } = req.params;
   const { livreId } = req.body;
 
   try {
-    // Find the user by userId
-    const user = await User.findById(userId);
+    const user = await User.findById(userId).populate('librairie');
 
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    // Add the bookId to the user's library
-    user.librairie.push(livreId);
-    await user.save();
+    if (user.role !== 'membre') {
+      return res.status(400).json({ message: 'Cannot add book to non-member user' });
+    }
+
+    if (user.librairie.length === 0) {
+      return res.status(404).json({ message: 'User does not have a default library' });
+    }
+
+    const librairie = user.librairie[0]; // Get the default library
+
+    // Add the livreId to the library's livres array
+    librairie.livres.push(livreId);
+    await librairie.save();
 
     res.status(200).json({ message: 'Book added to library successfully' });
   } catch (error) {
+    console.error("Error:", error);
     res.status(500).json({ message: error.message });
   }
 };
 
+
+
+//Ca marche sur qq Users
+// const addBookToLibrary = async (req, res) => {
+//   const { userId } = req.params;
+//   const { livreId } = req.body;
+
+//   try {
+//     console.log("User ID:", userId);
+//     console.log("Livre ID:", livreId);
+
+//     // Find the user by userId
+//     const user = await User.findById(userId);
+
+//     if (!user) {
+//       return res.status(404).json({ message: 'User not found' });
+//     }
+
+//     // Find the librairie by user's librairie ID
+//     const librairie = await Librairie.findOne({ user: userId });
+
+//     if (!librairie) {
+//       return res.status(404).json({ message: 'Librairie not found' });
+//     }
+
+//     // Push the livreId to the librairie's livres array
+//     librairie.livres.push(livreId);
+
+//     // Update the user reference in the librairie document
+//     librairie.user = userId;
+
+//     // Save both the librairie and user documents
+//     await librairie.save();
+//     await user.save();
+
+//     res.status(200).json({ message: 'Book added to library successfully' });
+//   } catch (error) {
+//     console.error("Error:", error);
+//     res.status(500).json({ message: error.message });
+//   }
+// };
+
+
+
+// const addBookToLibrary = async (req, res) => {
+//   const { userId } = req.params;
+//   const { livreId } = req.body;
+
+//   try {
+//     // Find the user by userId
+//     const user = await User.findById(userId);
+
+//     if (!user) {
+//       return res.status(404).json({ message: 'User not found' });
+//     }
+
+//       // Make sure user.librairie is an array
+//       if (!Array.isArray(user.librairie)) {
+//         user.librairie = []; // Initialize as an empty array if not an array
+//       }
+
+//     // Add the bookId to the user's library
+//     user.librairie.push(livreId);
+//     await user.save();
+
+//     res.status(200).json({ message: 'Book added to library successfully' });
+//   } catch (error) {
+//     res.status(500).json({ message: error.message });
+//   }
+// };
+//-------------------------------------- Lecture --------------------------------------//
+const LectureAuth = async (req, res) => {
+  const livreId = req.params.id;
+
+  try {
+    // Vérifiez si l'utilisateur est authentifié et a le droit de lire ce livre
+    const userId = req.user.id; // L'ID de l'utilisateur authentifié depuis le middleware d'authentification
+
+    // Vérifiez si l'utilisateur a le livre dans sa librairie
+    const user = await User.findById(userId);
+    const librairie = await Librairie.findOne({ user: userId, livres: livreId });
+
+    if (!librairie) {
+      return res.status(403).json({ message: "Vous n'avez pas accès à ce livre." });
+    }
+
+    // Si l'utilisateur est autorisé à lire le livre, renvoyez une réponse réussie
+    res.status(200).json({ message: 'Vous pouvez lire le livre maintenant.' });
+  } catch (error) {
+    console.error('Error reading book:', error);
+    res.status(500).json({ message: 'Une erreur est survenue lors de la lecture du livre.' });
+  }
+}
 
 //-------------------- Face Detector -------------------------------------------//
 // const FaceDetectorAuth = async (email, avatar) => {
@@ -392,6 +577,7 @@ const addBookToLibrary = async (req, res) => {
     authMiddleware, 
     updateProfile,
     getUserReadBooks,
-    addBookToLibrary
+    addBookToLibrary,
+    LectureAuth
   };
   

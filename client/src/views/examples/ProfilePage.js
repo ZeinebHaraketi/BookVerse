@@ -36,6 +36,9 @@ import {
   CardBody,
   Collapse,
   Form,
+  CardImg,
+  CardTitle,
+  CardText,
 } from "reactstrap";
 
 // core components
@@ -44,16 +47,24 @@ import ProfilePageHeader from "components/Headers/ProfilePageHeader.js";
 import DemoFooter from "components/Footers/DemoFooter.js";
 import { API } from "api_server";
 import axios from "axios";
-import { useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import "./ProfilePage.css"; // Import the custom CSS file
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
+  faBook,
+  faBookOpen,
   faCoffee,
   faCog,
+  faComment,
   faEnvelope,
+  faGamepad,
+  faInfoCircle,
+  faPlus,
   faStar,
+  faTag,
   faUser,
 } from "@fortawesome/free-solid-svg-icons";
+import StarRating from "./Livres/StarRating";
 
 function ProfilePage() {
   const [activeTab, setActiveTab] = React.useState("1");
@@ -71,7 +82,117 @@ function ProfilePage() {
   const [interets, setInterets] = useState("");
   const [niveau, setNiveau] = useState("");
   const [readBooks, setReadBooks] = useState([]);
+  const [chapitres, setChapitres] = useState([]);
+  const { id, chapitreId } = useParams(); // Get the book ID from the URL params
 
+  //--------------------- Critique ------------------------------------//
+  const [isCritiqueFormOpen, setIsCritiqueFormOpen] = useState(false);
+  const [livre, setLivre] = useState({});
+  const [rating, setRating] = useState(0);
+  const [comment, setComment] = useState("");
+  const [userCritiques, setUserCritiques] = useState([]);
+  const [showCritiques, setShowCritiques] = useState(false); // État pour afficher/masquer les critiques
+
+
+  const [critiqueD, setCritiqueD] = useState({
+    rating: 1,
+    comment: "",
+  });
+
+  useEffect(() => {
+    const fetchUserCritiques = async () => {
+      try {
+        const userId = localStorage.getItem('userId');
+        const token = localStorage.getItem('token');
+        const response = await axios.get(`http://localhost:5000/librairie/${user._id}/critiques`, {
+          headers: { 'x-auth-token': token }
+        });
+        setUserCritiques(response.data);
+        console.log(response.data);
+      } catch (error) {
+        console.error('Error fetching user critiques:', error);
+      }
+    };
+
+    fetchUserCritiques();
+  }, [user._id]);
+
+  const handleShowCritiques = () => {
+    setShowCritiques(!showCritiques);
+  };
+  
+  const handleAddCritique = async (livreId, e) => {
+    e.preventDefault(); // Empêche le comportement par défaut du formulaire
+    
+    try {
+      const userId = localStorage.getItem("userId");
+      const token = localStorage.getItem("token");
+  
+      const critiqueData = {
+        user: user._id,
+        rating: rating, 
+        comment: comment, 
+        livre: livreId
+      };
+  
+      console.log("Critique Data:", critiqueData); // Vérifiez les données envoyées
+  
+      const response = await axios.post(
+        `http://localhost:5000/livre/${livreId}/critiques/${user._id}`, // Utilisez la route modifiée
+        critiqueData,
+        {
+          headers: { "x-auth-token": token }
+        }
+      );
+  
+      if (response.status === 201) {
+        console.log("Critique ajoutée avec succès");
+        // Vous pouvez ajouter ici une notification ou un autre feedback utilisateur
+      }
+    } catch (error) {
+      console.error("Erreur lors de l'ajout de la critique :", error);
+      // Gérez l'erreur ici (par exemple, affichez un message d'erreur à l'utilisateur)
+    }
+  };
+
+
+  
+//Ca marche
+  // const handleAddCritique = async (livreId) => {
+
+  //   try {
+  //     const userId = localStorage.getItem("userId");
+  //     const token = localStorage.getItem("token");
+  
+  //     const critiqueData = {
+  //       user: user._id,
+  //       rating: rating, 
+  //       comment: comment, 
+  //       livre: livreId
+  //     };
+  
+  //     console.log("Critique Data:", critiqueData); // Vérifiez les données envoyées
+  
+  //     const response = await axios.post(
+  //       `http://localhost:5000/livre/${livreId}/critiques/${user._id}`, // Utilisez la route modifiée
+  //       critiqueData,
+  //       {
+  //         headers: { "x-auth-token": token }
+  //       }
+  //     );
+  
+  //     if (response.status === 201) {
+  //       console.log("Critique ajoutée avec succès");
+  //       // Vous pouvez ajouter ici une notification ou un autre feedback utilisateur
+  //     }
+  //   } catch (error) {
+  //     console.error("Erreur lors de l'ajout de la critique :", error);
+  //     // Gérez l'erreur ici (par exemple, affichez un message d'erreur à l'utilisateur)
+  //   }
+  // };
+  
+ 
+  const navigate = useNavigate();
 
   const toggle = (tab) => {
     if (activeTab !== tab) {
@@ -86,6 +207,18 @@ function ProfilePage() {
       document.body.classList.remove("landing-page");
     };
   });
+
+  const handleViewBooks = () => {
+    // Assume you have retrieved the token after successful login
+    const token = localStorage.getItem("token");
+    
+
+    if (token) {
+      navigate(`/books/${user._id}`);
+
+    }
+    // Redirect to the BookList component
+  };
 
   useEffect(() => {
     // Fetch user profile data after successful login
@@ -132,11 +265,14 @@ function ProfilePage() {
 
   };
 
+  console.log(user._id);
+
+
   useEffect(() => {
     // Fetch the user's read books from the backend API
     const fetchReadBooks = async () => {
       try {
-        const response = await axios.get(`${API}/user/${userId}/read-books`);
+        const response = await axios.get(`${API}/ReadBooks/${user._id}`);
         setReadBooks(response.data);
       } catch (error) {
         console.error("Error fetching read books:", error);
@@ -146,7 +282,21 @@ function ProfilePage() {
     // Assuming you have the user ID available, you can use it here.
     // Replace 'userId' with the actual user ID.
     fetchReadBooks();
-  }, []);
+  }, [user._id]);
+
+  //--------------------------------- Lire ------------------------------------------//
+  
+  const handleReadBook = () => {
+    if (chapitres.length > 0) {
+      const firstChapitreId = chapitres[0]._id;
+      navigate(`/lecture-livre/${id}/chapitre/${firstChapitreId}`);
+    }
+  };
+
+  const firstChapitreId = chapitres.length > 0 ? chapitres[0]._id : null;
+
+  // console.log("First Chapitre ID:", firstChapitreId);
+
 
   return (
     <>
@@ -331,14 +481,154 @@ function ProfilePage() {
        
         </Container>
       </div> */}
-
+<hr></hr>
 <div>
-      <h2>Bibliothèque</h2>
-      <ul>
-        {readBooks.map((book) => (
-          <li key={book._id}>{book.titre}</li>
-        ))}
-      </ul>
+      <h2 style={{ 
+        fontWeight: 'bold',
+        fontSize: '2rem',
+        color: '#3f51b5', 
+        textTransform: 'uppercase', 
+        letterSpacing: '1px', 
+        fontFamily: 'Arial, sans-serif', 
+        textAlign: 'center', 
+      }}> Ma Librairie
+      </h2>
+      <br></br>
+      <div className="view-books-button-container">
+        <Button
+        style={{ backgroundColor: '#3f51b5'}}
+        className="view-books-button" 
+          onClick={handleViewBooks}
+        >
+          <FontAwesomeIcon icon={faBook} className="icon" /> View Book List
+        </Button>
+      </div>
+
+
+      <br></br>
+      <Container>
+    <Row>
+      {readBooks.map((book) => (
+        <Col key={book._id} md="4">
+          <Card className="library-card">
+            {/* You can customize this section to display book images, titles, etc. */}
+            <CardImg top width="100%" src={book.image} alt={book.titre} />
+            <CardBody>
+              <CardTitle tag="h5">
+              <FontAwesomeIcon icon={faBook} className="mr-2" />
+                {book.titre}
+              </CardTitle>
+              <br></br>
+              <CardText>
+              <FontAwesomeIcon icon={faInfoCircle} className="mr-2" /> 
+                {book.resume}
+              </CardText>
+              <CardText>
+              <FontAwesomeIcon icon={faTag} className="mr-2" /> 
+                {book.genre}
+              </CardText>
+              <CardText>
+              <FontAwesomeIcon icon={faBookOpen} className="mr-2" />
+                {book.categorie}
+              </CardText>
+
+              <Button
+                    // color="primary"
+                    onClick={() => navigate(`/detailsLivre/${book._id}`)}
+                    className="details-button"
+                  >
+                    <FontAwesomeIcon icon={faGamepad} /> Details
+              </Button>
+              <Button
+  // onClick={() => handleAddCritique(book._id)}
+  onClick={() => setIsCritiqueFormOpen(true)} 
+
+  className="add-critique-button"
+      >
+        <FontAwesomeIcon icon={faComment} className="icon" />  Critiquer
+              </Button>
+
+            </CardBody>
+            <Button
+            onClick={() => handleShowCritiques(livre._id)}
+            className="show-critiques-button"
+          >
+            Afficher les critiques
+          </Button>
+
+          {/* Section pour afficher les critiques */}
+          {livre.isCritiquesVisible && (
+            <div>
+              <h3>Critiques :</h3>
+              <ul>
+                {livre.critiques.map((critique) => (
+                  <li key={critique._id}>
+                    Note : {critique.rating}, Commentaire : {critique.comment}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+          </Card>
+
+          <Collapse isOpen={isCritiqueFormOpen}>
+  <Card>
+    <CardBody>
+    {/* <Form onSubmit={handleAddCritique(book._id)}> */}
+    <Form onSubmit={(e) => handleAddCritique(book._id, e)}>
+
+        <FormGroup>
+          <Label for="rating">Note</Label>
+
+          <Input
+            type="number"
+            id="rating"
+            value={rating}
+            onChange={(e) => setRating(e.target.value)}
+            min="0"
+            max="5"
+            required
+          />
+        </FormGroup>
+        <FormGroup>
+          <Label for="comment">Commentaire</Label>
+          <Input
+            type="textarea"
+            id="comment"
+            value={comment}
+            onChange={(e) => setComment(e.target.value)}    
+            
+          />
+        </FormGroup>
+        <div className="critique-container">
+
+        <Button 
+        type="submit" 
+        color="primary"
+        className="add-critique-button"
+        >
+                <FontAwesomeIcon icon={faPlus} className="icon" />  Critique
+
+        </Button>
+        <Button
+          type="button"
+          color="secondary"
+          onClick={() => setIsCritiqueFormOpen(false)} // Ferme le formulaire
+          className="cancel-button"
+        >
+          Annuler
+        </Button>
+        </div>
+      </Form>
+    </CardBody>
+  </Card>
+</Collapse>
+
+        </Col>
+      ))}
+    </Row>
+   
+  </Container>
     </div>
       <DemoFooter />
     </>

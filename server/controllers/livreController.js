@@ -628,6 +628,42 @@ const ajouterCritiqueLivre = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+// const ajouterCritiqueLivre = async (req, res) => {
+//   try {
+//     const userId = req.params.userId;
+//     const { rating, comment, livreId } = req.body;
+
+//     const livre = await Livre.findById(livreId);
+
+//     if (!livre) {
+//       return res.status(404).json({ error: 'Livre non trouvé' });
+//     }
+
+//     const critique = new Critique({
+//       user: userId,
+//       rating: rating,
+//       comment: comment,
+//       livre: livre._id
+//     });
+
+//     const savedCritique = await critique.save();
+
+//     const user = await User.findById(userId);
+//     user.critiques.push(savedCritique._id);
+//     await user.save();
+
+//     if (!Array.isArray(livre.critiques)) {
+//       livre.critiques = [];
+//     }
+//     livre.critiques.push(savedCritique._id);
+//     await livre.save();
+
+//     res.status(201).json({ message: 'Critique ajoutée avec succès', critique: savedCritique });
+//   } catch (error) {
+//     res.status(500).json({ error: error.message });
+//   }
+// };
+
 
 
 //------------------------------------- Modifier une Critique dans un Livre --------------------------------------------//

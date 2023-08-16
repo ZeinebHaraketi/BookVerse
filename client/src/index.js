@@ -39,6 +39,7 @@ import ProfilePageModerateur from "views/examples/ProfilePageModerateur";
 import AfficherLivres from "views/examples/Livres/AfficherLivres";
 import DetailsLivres from "views/examples/Livres/DetailsLivres";
 import LectureLivre from "views/examples/Livres/LectureLivre";
+import BookList from "views/examples/Livres/BookListUser";
 
 
 // others
@@ -64,6 +65,7 @@ root.render(
       <Route path="/livres" element={<AfficherLivres />} />
       <Route path="/detailsLivre/:id" element={<DetailsLivres />} />
       <Route path="/lecture-livre/:livreId/chapitre/:chapitreId"  element={<LectureLivre />}/>
+      <Route path="/books/:id" element={<BookList />} />
 
 
 

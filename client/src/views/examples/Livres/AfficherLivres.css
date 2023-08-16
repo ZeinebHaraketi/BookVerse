@@ -198,3 +198,28 @@
 .details-button:hover {
   background-color: #94169d; /* Change button background color on hover */
 }
+
+.add-to-library-button {
+  background-color: #ff9900; /* Couleur de fond */
+  color: #ffffff; /* Couleur du texte */
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  font-size: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin-right: 10px; /* Ajoute une marge à droite du bouton */
+
+}
+
+.add-to-library-button:hover {
+  background-color: #ff8c00; /* Changement de couleur au survol */
+}
+
+.add-icon {
+  margin-right: 8px; /* Espace entre l'icône et le texte */
+}
+

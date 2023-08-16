@@ -104,6 +104,7 @@ router.delete('/:livreId/adaptations/:adaptationId', supprimerAdaptationLivre);
 
 //Critiques
 router.post('/:livreId/critiques/:userId', ajouterCritiqueLivre); //Ca marche
+// router.post('/:userId/critiques', ajouterCritiqueLivre);
 router.put('/:livreId/critiques/:userId/:critiqueId', modifierCritiqueLivre);
 router.delete('/supp/:livreId/critiques/:userId/:critiqueId', supprimerCritiqueLivre);
 

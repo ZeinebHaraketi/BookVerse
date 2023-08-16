@@ -93,3 +93,113 @@
   margin-right: 8px;
 }
 
+/* Styling only for library book cards */
+.library-card {
+  margin-bottom: 20px;
+  border: none;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s;
+}
+
+.library-card:hover {
+  transform: translateY(-5px);
+}
+
+.library-card .card-img-top {
+  height: 200px;
+  object-fit: cover;
+}
+
+.library-card .card-body {
+  padding: 1.25rem;
+}
+
+.library-card .card-title {
+  font-size: 1.25rem;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.library-card .card-text {
+  font-size: 0.9rem;
+  color: #333;
+}
+
+/* Additional styling for library book cards */
+.library-card .card-button {
+  background-color: #007bff;
+  color: #fff;
+  padding: 5px 10px;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.library-card .card-button:hover {
+  background-color: #0056b3;
+}
+
+/* Styles for the View Book List button */
+.view-books-button {
+  background-color: #3f51b5; /* Change the background color */
+  color: white; /* Change the text color */
+  border: none;
+  border-radius: 5px;
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+  align-items: center;
+  display: flex;
+  justify-content: flex-end; /* Align the button to the right */
+  margin-top: 20px; 
+}
+
+/* Style for the container that holds the View Book List button */
+.view-books-button-container {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 20px; /* Add some margin for spacing */
+}
+
+/* Style for the icon within the button */
+.view-books-button .icon {
+  margin-right: 10px; /* Add some space between the icon and text */
+}
+
+.critique-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 20px;
+}
+
+
+.add-critique-button, .details-button {
+  margin-right: 10px; /* Ajoutez la marge désirée sous le bouton */
+}
+
+.cancel-button {
+  margin-left: 10px; /* Ajoutez la marge désirée au-dessus du bouton */
+}
+
+
+@media (max-width: 768px) {
+  /* Styles for screens up to 768px width */
+  .library-card {
+    /* Adjust card styles for smaller screens */
+    width: 100%; /* Cards take full width */
+  }
+
+  /* ... Other responsive styles ... */
+}
+
+@media (max-width: 576px) {
+  /* Styles for screens up to 576px width */
+  .library-card {
+    /* Adjust card styles further for smaller screens */
+    padding: 0.75rem;
+  }
+
+  /* ... Other responsive styles ... */
+}

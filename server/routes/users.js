@@ -1,11 +1,12 @@
 var express = require('express');
-const { register,login, logout, forgetPassword, reset_password, FaceDetectorAuth, authMiddleware, updateProfile, getUserReadBooks, addBookToLibrary } = require('../controllers/userController');
+const { register,login, logout, forgetPassword, reset_password, FaceDetectorAuth, authMiddleware, updateProfile, getUserReadBooks, addBookToLibrary, LectureAuth } = require('../controllers/userController');
 var router = express.Router();
 
 const multer = require('multer');
 const cloudinary = require('cloudinary').v2;
 const { CloudinaryStorage } = require('multer-storage-cloudinary');
 const User = require('../models/users');
+const Livre = require('../models/livre');
 
 
 
@@ -40,9 +41,32 @@ router.get("/login", async (req, res) => {
 });
 
 // Route to fetch read books for a user
-router.get('/user/:userId/read-books', getUserReadBooks);
+router.get('/ReadBooks/:userId', getUserReadBooks);
 // Route to add books to the user's library
-router.post('/user/:userId/add-book', addBookToLibrary);
+// router.post('/user/:userId/add-book', addBookToLibrary);
+router.post('/user/addBookToLibrary/:userId', addBookToLibrary);
+
+//ALL books
+router.get("/books", authMiddleware, async (req, res) => {
+  try {
+    const books = await Livre.find();
+    res.json(books);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+//Display Critiques
+router.get('/librairie/:userId/critiques', async (req, res) => {
+  try {
+    const userId = req.params.userId;
+    const user = await User.findById(userId).populate('critiques');
+    res.status(200).json(user.critiques);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 
 
 // Route to get user profile
@@ -98,6 +122,7 @@ router.post('/auth/face', async (req, res) => {
     }
 });
 
+router.post('/lecture/:id', authMiddleware, LectureAuth);
 
 // Update the user profile information
 // router.put('/mod/profile', authMiddleware, updateProfile);

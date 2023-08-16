@@ -97,6 +97,7 @@ function RegisterPage() {
       console.log(response.data);
       setShowAlert(true);
       setAlertMessage(response.data.message);
+      navigate('/login');
     } catch (error) {
       // Handle registration errors here (e.g., show error message)
       console.error(error);

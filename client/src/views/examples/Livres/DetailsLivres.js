@@ -53,7 +53,7 @@ import DemoFooter from "components/Footers/DemoFooter.js";
 import { API } from "api_server";
 import axios from "axios";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faBook, faInfoCircle, faList, faSearch, faTag, faTags, faUser, faListUl, faBookOpen } from "@fortawesome/free-solid-svg-icons";
+import { faBook, faList, faTags, faUser, faListUl, faBookOpen } from "@fortawesome/free-solid-svg-icons";
 
 import "./DetailsLivres.css";
 import LivreHeader from "components/Headers/LivreHeader";
@@ -67,6 +67,9 @@ function DetailsLivres() {
   const [chapitres, setChapitres] = useState([]);
   const [chapitre, setChapitre] = useState({});
   const [isBookAdded, setIsBookAdded] = useState(false);
+
+  const { idL } = useParams();
+
 
 
   const navigate = useNavigate();
@@ -165,6 +168,16 @@ function DetailsLivres() {
     navigate(`/lecture-livre/${livre._id}/chapitre/${chapterId}`);
   };
 
+  const handleLecture = async () => {
+    try {
+      const response = await axios.post(`${API}/lecture/${id}`);
+      console.log(response.data.message); // Affichez un message de succès ou mettez à jour l'état si nécessaire
+    } catch (error) {
+      console.error('Error reading book:', error);
+      // Gérez les erreurs ici
+    }
+  };
+
   // const handleAddToLibrary = async () => {
   //   try {
   //     const response = await axios.post(`${API}/user/${userId}/add-book`, {
@@ -222,6 +235,8 @@ function DetailsLivres() {
 
                 Lire
               </Button>
+
+              
 
               <div className="d-flex justify-content-center mt-3">
       <Button color="primary" style={{ backgroundColor: "#9500ff", border: "none" }} onClick={handleShowTableOfContents}>
