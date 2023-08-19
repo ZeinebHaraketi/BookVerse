@@ -1,6 +1,5 @@
 const mongoose = require('mongoose');
 const Librairie = require('./librairie');
-// const Librairie = require('./librairie'); // Adjust the path as needed
 
 
 
@@ -17,7 +16,7 @@ const userSchema = new mongoose.Schema({
     recompenses: { type: [String] },
     historiqueLecture: { type: [String] },
     historiqueAchat: { type: [String] },
-    clubLecture: {type: mongoose.Schema.Types.ObjectId, ref: 'ClubDeLecture' },
+    clubLecture: [{type: mongoose.Schema.Types.ObjectId, ref: 'ClubDeLecture' }],
     librairie: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Librairie'
@@ -26,6 +25,8 @@ const userSchema = new mongoose.Schema({
     discussions: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Discussion' }],
     livres_lus: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Livre' }],
     critiques: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Critique' }],
+    // defaultCart: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Panier' }],
+    defaultCart: { type: mongoose.Schema.Types.ObjectId, ref: 'Panier' },
     faceDescriptor: { type: Array },
 });
 

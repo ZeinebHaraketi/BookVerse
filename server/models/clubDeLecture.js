@@ -7,7 +7,7 @@ const clubDeLectureSchema = new mongoose.Schema({
   discussions: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Discussion' }],
   livres_lus: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Livre' }],
   createdDate: { type: Date, default: Date.now },
-  createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   events: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Event' }],
 });
 

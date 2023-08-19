@@ -53,10 +53,13 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faBook,
   faBookOpen,
+  faBoxOpen,
   faCoffee,
   faCog,
   faComment,
   faEnvelope,
+  faEye,
+  faEyeSlash,
   faGamepad,
   faInfoCircle,
   faPlus,
@@ -64,7 +67,8 @@ import {
   faTag,
   faUser,
 } from "@fortawesome/free-solid-svg-icons";
-import StarRating from "./Livres/StarRating";
+import { faStar as faStarSolid, faStar as faStarRegular } from '@fortawesome/free-solid-svg-icons';
+import MembreNavbar from "components/Navbars/MembreNavbar";
 
 function ProfilePage() {
   const [activeTab, setActiveTab] = React.useState("1");
@@ -92,6 +96,7 @@ function ProfilePage() {
   const [comment, setComment] = useState("");
   const [userCritiques, setUserCritiques] = useState([]);
   const [showCritiques, setShowCritiques] = useState(false); // État pour afficher/masquer les critiques
+  const [isCritiquesDisplayed, setIsCritiquesDisplayed] = useState(false);
 
 
   const [critiqueD, setCritiqueD] = useState({
@@ -100,23 +105,38 @@ function ProfilePage() {
   });
 
   useEffect(() => {
-    const fetchUserCritiques = async () => {
-      try {
-        const userId = localStorage.getItem('userId');
-        const token = localStorage.getItem('token');
-        const response = await axios.get(`http://localhost:5000/librairie/${user._id}/critiques`, {
-          headers: { 'x-auth-token': token }
-        });
-        setUserCritiques(response.data);
-        console.log(response.data);
-      } catch (error) {
-        console.error('Error fetching user critiques:', error);
-      }
-    };
+   
 
-    fetchUserCritiques();
+    
+    // const fetchUserCritiques = async () => {
+    //   try {
+    //     const userId = localStorage.getItem('userId');
+    //     const token = localStorage.getItem('token');
+    //     const response = await axios.get(`http://localhost:5000/librairieCritique/${user._id}`, {
+    //       headers: { 'x-auth-token': token }
+    //     });
+    //     setUserCritiques(response.data);
+    //     console.log(response.data);
+    //   } catch (error) {
+    //     console.error('Error fetching user critiques:', error);
+    //   }
+    // };
+
+    // fetchUserCritiques();
   }, [user._id]);
 
+  const fetchCritiquesForLivre = async (livreId) => {
+    try {
+      const userId = localStorage.getItem('userId');
+      const token = localStorage.getItem('token');
+      const response = await axios.get(`http://localhost:5000/librairie/${user._id}/critiques/${livreId}`, {
+        headers: { 'x-auth-token': token }
+      });
+      setUserCritiques(response.data);
+    } catch (error) {
+      console.error('Error fetching critiques:', error);
+    }
+  };
   const handleShowCritiques = () => {
     setShowCritiques(!showCritiques);
   };
@@ -209,7 +229,6 @@ function ProfilePage() {
   });
 
   const handleViewBooks = () => {
-    // Assume you have retrieved the token after successful login
     const token = localStorage.getItem("token");
     
 
@@ -217,7 +236,6 @@ function ProfilePage() {
       navigate(`/books/${user._id}`);
 
     }
-    // Redirect to the BookList component
   };
 
   useEffect(() => {
@@ -295,13 +313,27 @@ function ProfilePage() {
 
   const firstChapitreId = chapitres.length > 0 ? chapitres[0]._id : null;
 
-  // console.log("First Chapitre ID:", firstChapitreId);
+  const generateStars = (rating) => {
+    const stars = [];
+    for (let i = 0; i <= 5; i++) {
+      stars.push(
+        <FontAwesomeIcon
+          key={i}
+          icon={i <= rating ? faStar : faStarRegular}
+          className="star-icon"
+        />
+      );
+    }
+    return stars;
+  };
 
 
+  
   return (
     <>
-      <ExamplesNavbar />
+      <MembreNavbar />
       <ProfilePageHeader />
+    
       <br />
 
       <Container className="profile-page">
@@ -414,75 +446,9 @@ function ProfilePage() {
           </Col>
         </Row>
       </Container>
-      {/* <div className="section profile-content">
-        <Container>
-        {user ? (
-          <div className="owner">
-            <div className="avatar">
-              <img
-                alt="..."
-                className="img-circle img-no-padding img-responsive"
-                src={user.avatar}
-                // src={require("assets/img/faces/joe-gardner-2.jpg")}
-              />
-            </div>
-
-            <div className="name">
-              <h4 className="title">
-              {user.nom} {user.prenom}<br />
-              </h4>
-            </div>
-            <p > <strong>{user.email} </strong> </p>
-          </div>
-        ): (
-          <p>Loading...</p>
-        )}
-          <Row>
-            <Col className="ml-auto mr-auto text-center" md="6">
-              <p>
-                An artist of considerable range, Jane Faker — the name taken by
-                Melbourne-raised, Brooklyn-based Nick Murphy — writes, performs
-                and records all of his own music, giving it a warm, intimate
-                feel with a solid groove structure.
-              </p>
-              <br />
-              <Button className="btn-round" color="default" outline>
-                <i className="fa fa-cog" /> Settings
-              </Button>
-            </Col>
-          </Row>
-          <br />
-          <div className="nav-tabs-navigation">
-            <div className="nav-tabs-wrapper">
-              <Nav role="tablist" tabs>
-                <NavItem>
-                  <NavLink
-                    className={activeTab === "1" ? "active" : ""}
-                    onClick={() => {
-                      toggle("1");
-                    }}
-                  >
-                    Follows
-                  </NavLink>
-                </NavItem>
-                <NavItem>
-                  <NavLink
-                    className={activeTab === "2" ? "active" : ""}
-                    onClick={() => {
-                      toggle("2");
-                    }}
-                  >
-                    Following
-                  </NavLink>
-                </NavItem>
-              </Nav>
-            </div>
-          </div>
-       
-        </Container>
-      </div> */}
+    
 <hr></hr>
-<div>
+    <div>
       <h2 style={{ 
         fontWeight: 'bold',
         fontSize: '2rem',
@@ -500,7 +466,7 @@ function ProfilePage() {
         className="view-books-button" 
           onClick={handleViewBooks}
         >
-          <FontAwesomeIcon icon={faBook} className="icon" /> View Book List
+          <FontAwesomeIcon icon={faBook} className="icon" /> Afficher tous les Livres
         </Button>
       </div>
 
@@ -539,36 +505,68 @@ function ProfilePage() {
                   >
                     <FontAwesomeIcon icon={faGamepad} /> Details
               </Button>
+              <br></br>
+              {/* <Button onClick={() => fetchCritiquesForLivre(book._id)}>
+            Afficher les critiques
+          </Button> */}
+          <Button 
+          className="display-critique-button"
+          onClick={() => setIsCritiquesDisplayed(!isCritiquesDisplayed)}
+              style={{ marginRight: '10px',
+              backgroundColor: '#6963ec',
+              color: 'white',
+            }} 
+          >
+  {isCritiquesDisplayed ? (
+      <>
+      <FontAwesomeIcon icon={faEyeSlash} />  
+    </>
+  ) : (
+    <>
+      <FontAwesomeIcon icon={faEye} />  
+    </>
+  ) } Critiques
+          </Button>
+
+{isCritiquesDisplayed && (
+  <>
+    {userCritiques.map((critique) => (
+      <div key={critique._id} className="critique">
+        <div className="rating">
+          {Array.from({ length: critique.rating }).map((_, index) => (
+            <FontAwesomeIcon key={index} icon={faStarSolid} className="star" />
+          ))}
+          {Array.from({ length: 5 - critique.rating }).map((_, index) => (
+            <FontAwesomeIcon key={index} icon={faStarRegular} className="star" />
+          ))}
+        </div>
+        <p> {critique.comment} </p>
+      </div>
+    ))}
+  </>
+)}
+
+          
+          {/* {userCritiques.map((critique) => (
+          <div key={critique._id} className="critique">
+            <div className="rating-container">
+              {generateStars(critique.rating)}
+            </div>
+            <p>{critique.comment}</p>
+          </div>
+        ))} */}
               <Button
-  // onClick={() => handleAddCritique(book._id)}
   onClick={() => setIsCritiqueFormOpen(true)} 
 
   className="add-critique-button"
       >
         <FontAwesomeIcon icon={faComment} className="icon" />  Critiquer
               </Button>
+              
 
             </CardBody>
-            <Button
-            onClick={() => handleShowCritiques(livre._id)}
-            className="show-critiques-button"
-          >
-            Afficher les critiques
-          </Button>
-
-          {/* Section pour afficher les critiques */}
-          {livre.isCritiquesVisible && (
-            <div>
-              <h3>Critiques :</h3>
-              <ul>
-                {livre.critiques.map((critique) => (
-                  <li key={critique._id}>
-                    Note : {critique.rating}, Commentaire : {critique.comment}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
+            
+          
           </Card>
 
           <Collapse isOpen={isCritiqueFormOpen}>
@@ -630,6 +628,20 @@ function ProfilePage() {
    
   </Container>
     </div>
+
+<hr></hr>
+
+<div>
+<div className="view-books-button-container">
+        <Button
+        style={{ backgroundColor: '#3f51b5'}}
+        className="view-books-button" 
+          onClick={handleViewBooks}
+        >
+          <FontAwesomeIcon icon={faBoxOpen} className="icon" /> Afficher Tout les Produits
+        </Button>
+      </div>
+</div>
       <DemoFooter />
     </>
   );

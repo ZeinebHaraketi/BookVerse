@@ -1,5 +1,5 @@
 var express = require('express');
-const { ajouterProduit, afficherProduits, AfficherOneProduit, modifierProduit, supprimerProduit } = require('../controllers/ProduitController');
+const { ajouterProduit, afficherProduits, AfficherOneProduit, modifierProduit, supprimerProduit, rechercheProduits } = require('../controllers/ProduitController');
 var router = express.Router();
 const multer = require('multer');
 const cloudinary = require('cloudinary').v2;
@@ -25,10 +25,13 @@ const upload = multer({ storage: storage });
 
 
 router.post('/add', upload.single('imageP'), ajouterProduit);
-router.get('/', afficherProduits);
+router.get('/aff', afficherProduits);
 router.get('/:id', AfficherOneProduit);
 router.put('/mod/:id', modifierProduit);
 router.delete('/del/:id', supprimerProduit);
+
+router.get('/produits/recherche', rechercheProduits);
+
 
 
 module.exports = router;

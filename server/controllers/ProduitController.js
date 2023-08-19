@@ -106,10 +106,55 @@ const supprimerProduit = async (req, res) => {
   }
 };
 
+
+// Recherche
+const rechercheProduits = async (req, res) => {
+  try {
+    const {
+      nom,
+      prix,
+      qte,
+      categorie,
+     
+    } = req.query;
+
+    // Create an array to store individual queries
+    const queries = [];
+
+    // Build the query for each search parameter if it exists
+    if (nom) {
+      queries.push({ nom: { $regex: nom, $options: "i" } });
+    }
+
+    if (prix) {
+      queries.push({ prix });
+    }
+
+    if (qte) {
+      queries.push({ qte });
+    }
+
+    if (categorie) {
+      queries.push({ categorie: { $regex: categorie, $options: "i" } });
+    }
+
+   
+
+    // Combine individual queries using "$or" to perform an "OR" operation
+    const combinedQuery = { $or: queries };
+
+    const produits = await Produit.find(combinedQuery);
+
+    res.json(produits);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
 module.exports = {
   ajouterProduit,
   afficherProduits,
   AfficherOneProduit,
   modifierProduit,
-  supprimerProduit
+  supprimerProduit,
+  rechercheProduits
 };

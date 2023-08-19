@@ -1,5 +1,5 @@
 var express = require('express');
-const { register,login, logout, forgetPassword, reset_password, FaceDetectorAuth, authMiddleware, updateProfile, getUserReadBooks, addBookToLibrary, LectureAuth } = require('../controllers/userController');
+const { register,login, logout, forgetPassword, reset_password, FaceDetectorAuth, authMiddleware, updateProfile, getUserReadBooks, addBookToLibrary, LectureAuth, AjoutClub, getUserClubs, addMembersByInterests, addDefaultCartToUser, getCartByUserId, addProductToCart, getUserCartProducts } = require('../controllers/userController');
 var router = express.Router();
 
 const multer = require('multer');
@@ -42,8 +42,6 @@ router.get("/login", async (req, res) => {
 
 // Route to fetch read books for a user
 router.get('/ReadBooks/:userId', getUserReadBooks);
-// Route to add books to the user's library
-// router.post('/user/:userId/add-book', addBookToLibrary);
 router.post('/user/addBookToLibrary/:userId', addBookToLibrary);
 
 //ALL books
@@ -57,7 +55,7 @@ router.get("/books", authMiddleware, async (req, res) => {
 });
 
 //Display Critiques
-router.get('/librairie/:userId/critiques', async (req, res) => {
+router.get('/librairieCritique/:userId', async (req, res) => {
   try {
     const userId = req.params.userId;
     const user = await User.findById(userId).populate('critiques');
@@ -66,6 +64,58 @@ router.get('/librairie/:userId/critiques', async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
+
+//Ca marche
+router.get('/librairie/:userId/critiques/:livreId', async (req, res) => {
+  try {
+    const userId = req.params.userId;
+    const livreId = req.params.livreId;
+
+    const user = await User.findById(userId).populate({
+      path: 'librairie',
+      populate: {
+        path: 'livres',
+        populate: {
+          path: 'critiques',
+        }
+      }
+    });
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    let critiques = [];
+
+    user.librairie.forEach((librairieItem) => {
+      librairieItem.livres.forEach((livre) => {
+        if (livre._id.toString() === livreId) {
+          critiques = livre.critiques;
+        }
+      });
+    });
+
+    res.status(200).json(critiques);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+//Club de Lecture
+router.post('/addClub/:id', AjoutClub);
+router.get('/getClubs/:userId', getUserClubs);
+router.post('/addMembersByInterests/:clubId/:userId', addMembersByInterests);
+
+
+//Panier
+router.post('/addDefaultCart/:id', addDefaultCartToUser);
+router.get('/getCart/:id', getCartByUserId);
+
+//Produits
+// router.post('/addProductToCart/:userId/', addProductToCart);
+router.post('/addProductToCart/:userId/:productId', addProductToCart);
+router.get('/cart/:userId/products', getUserCartProducts);
+
 
 
 

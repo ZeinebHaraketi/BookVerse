@@ -15,12 +15,15 @@ require("dotenv").config();
 
 const User = require('../models/users');
 const Librairie = require('../models/librairie');
-const Livre = require('../models/livre')
+const Livre = require('../models/livre');
+const Club = require('../models/clubDeLecture'); 
+
 
 
 
 const cloudinary = require('cloudinary').v2;
 const { CloudinaryStorage } = require('multer-storage-cloudinary');
+const Panier = require('../models/panier');
 
 
 
@@ -316,35 +319,7 @@ const updateProfile = async (req, res) => {
 
 
 //------------------------------------- Afficher Livre Lus par le User -------------------------------------------//
-// const getUserReadBooks = async (req, res) => {
-//   const { userId } = req.params;
 
-//   try {
-//     console.log("User ID:", userId);
-
-//     // Find the user by their ID
-//     const user = await User.findById(userId).populate('librairie');
-//     const populatedLibrairie = await Librairie.populate(user.librairie, { path: 'livres' });
-// console.log(populatedLibrairie);
-
-//     console.log("User:", user);
-
-//     if (!user) {
-//       return res.status(404).json({ message: "User not found" });
-//     }
-
-//     // Access the 'livres' array within the 'librairie'
-//     const libraryBooks = user.librairie.livres;
-
-//     // Populate the 'livres' array to get the book documents
-//     const populatedLibraryBooks = await Livre.find({ _id: { $in: libraryBooks } });
-
-//     res.status(200).json(populatedLibraryBooks);
-//   } catch (error) {
-//     console.error("Error:", error);
-//     res.status(500).json({ message: error.message });
-//   }
-// };
 const getUserReadBooks = async (req, res) => {
   const { userId } = req.params;
 
@@ -361,7 +336,6 @@ const getUserReadBooks = async (req, res) => {
       return res.status(400).json({ message: "User's library is empty" });
     }
 
-    // Access the 'livres' array within the 'librairie'
     const libraryBooks = user.librairie[0].livres; // Assuming you're accessing the first librairie
 
     // Populate the 'livres' array to get the book documents
@@ -375,47 +349,6 @@ const getUserReadBooks = async (req, res) => {
 };
 
 
-// const getUserReadBooks = async (req, res) => {
-//   const { userId } = req.params;
-
-//   try {
-
-//     // Find the user by their ID and populate the 'librairie' field
-//     const user = await User.findById(userId).populate('librairie');
-
-//     if (!user) {
-//       return res.status(404).json({ message: "User not found" });
-//     }
-
-//     // Check if the 'librairie' field is populated
-//     if (!user.librairie) {
-//       return res.status(400).json({ message: "User's library is empty" });
-//     }
-
-//     // Access the 'livres' array within the 'librairie'
-//     const libraryBooks = user.librairie.livres;
-
-//     console.log("Library Books:", libraryBooks);
-//     console.log("User's Library:", user.librairie);
-
-
-//     // Check if there are any books in the library
-//     // if (!libraryBooks || libraryBooks.length === 0) {
-//     //   return res.status(400).json({ message: "User's library has no books" });
-//     // }
-
-//     // Populate the 'livres' array to get the book documents
-//     const populatedLibraryBooks = await Livre.find({ _id: { $in: libraryBooks } });
-
-//     res.status(200).json(populatedLibraryBooks);
-//   } catch (error) {
-//     console.error("Error:", error);
-//     res.status(500).json({ message: error.message });
-//   }
-// };
-
-
-//----------------------------- Ajout de Livre à une Librairie -------------------------------//
 
 const addBookToLibrary = async (req, res) => {
   const { userId } = req.params;
@@ -450,81 +383,10 @@ const addBookToLibrary = async (req, res) => {
 };
 
 
-
-//Ca marche sur qq Users
-// const addBookToLibrary = async (req, res) => {
-//   const { userId } = req.params;
-//   const { livreId } = req.body;
-
-//   try {
-//     console.log("User ID:", userId);
-//     console.log("Livre ID:", livreId);
-
-//     // Find the user by userId
-//     const user = await User.findById(userId);
-
-//     if (!user) {
-//       return res.status(404).json({ message: 'User not found' });
-//     }
-
-//     // Find the librairie by user's librairie ID
-//     const librairie = await Librairie.findOne({ user: userId });
-
-//     if (!librairie) {
-//       return res.status(404).json({ message: 'Librairie not found' });
-//     }
-
-//     // Push the livreId to the librairie's livres array
-//     librairie.livres.push(livreId);
-
-//     // Update the user reference in the librairie document
-//     librairie.user = userId;
-
-//     // Save both the librairie and user documents
-//     await librairie.save();
-//     await user.save();
-
-//     res.status(200).json({ message: 'Book added to library successfully' });
-//   } catch (error) {
-//     console.error("Error:", error);
-//     res.status(500).json({ message: error.message });
-//   }
-// };
-
-
-
-// const addBookToLibrary = async (req, res) => {
-//   const { userId } = req.params;
-//   const { livreId } = req.body;
-
-//   try {
-//     // Find the user by userId
-//     const user = await User.findById(userId);
-
-//     if (!user) {
-//       return res.status(404).json({ message: 'User not found' });
-//     }
-
-//       // Make sure user.librairie is an array
-//       if (!Array.isArray(user.librairie)) {
-//         user.librairie = []; // Initialize as an empty array if not an array
-//       }
-
-//     // Add the bookId to the user's library
-//     user.librairie.push(livreId);
-//     await user.save();
-
-//     res.status(200).json({ message: 'Book added to library successfully' });
-//   } catch (error) {
-//     res.status(500).json({ message: error.message });
-//   }
-// };
-//-------------------------------------- Lecture --------------------------------------//
 const LectureAuth = async (req, res) => {
   const livreId = req.params.id;
 
   try {
-    // Vérifiez si l'utilisateur est authentifié et a le droit de lire ce livre
     const userId = req.user.id; // L'ID de l'utilisateur authentifié depuis le middleware d'authentification
 
     // Vérifiez si l'utilisateur a le livre dans sa librairie
@@ -542,6 +404,249 @@ const LectureAuth = async (req, res) => {
     res.status(500).json({ message: 'Une erreur est survenue lors de la lecture du livre.' });
   }
 }
+
+//------------------------ Club de Lecture --------------------------------------//
+const AjoutClub = async (req, res) => {
+  try {
+    const { name, description } = req.body;
+    const createdBy = req.params.id; // Use the user ID from req.params
+
+    // Create a new club in the ClubDeLecture collection
+    const club = new Club({
+      name,
+      description,
+      createdBy,
+      membres: [createdBy], // Add the createdBy user as a member
+    });
+
+    const savedClub = await club.save();
+
+    // Update user's clubLecture field with the new club's ID
+    await User.findByIdAndUpdate(createdBy, { $push: { clubLecture: savedClub._id } });
+
+    console.log(createdBy);
+    res.status(201).json(savedClub);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+
+
+const getUserClubs = async (req, res) => {
+  const userId = req.params.userId;
+
+  try {
+    const user = await User.findById(userId).populate('clubLecture');
+    
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    if (!user.clubLecture) {
+      return res.status(200).json([]); // Return an empty array if the user has no clubs
+    }
+
+    const userClubs = user.clubLecture.map((club) => ({
+      name: club.name,
+      description: club.description
+    }));
+
+    res.status(200).json(userClubs);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+
+const addMembersByInterests = async (req, res) => {
+  try {
+    const userId = req.params.userId;
+    const clubId = req.params.clubId;
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    const club = await Club.findById(clubId);
+    if (!club) {
+      return res.status(404).json({ error: 'Club not found' });
+    }
+
+    // Check if the user is the creator of the club
+    if (club.createdBy.toString() !== userId) {
+      return res.status(403).json({ error: 'You are not the creator of this club' });
+    }
+
+    // Find users with shared interests and add them as members
+    const sharedInterestUsers = await User.find({ interets: { $in: user.interets } });
+
+    sharedInterestUsers.forEach(async (sharedUser) => {
+      if (!club.membres.includes(sharedUser._id.toString())) {
+        club.membres.push(sharedUser._id);
+        await club.save();
+      }
+    });
+
+    res.status(200).json({ message: 'Members with shared interests added to the club' });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+
+//------------------------- Panier ---------------------------------//
+const addDefaultCartToUser = async (req, res) => {
+  try {
+    const userId = req.params.id; // Get the user ID from req.params
+    console.log('User ID:', userId); // Log the user ID
+    const user = await User.findById(userId);
+
+    if (!user) {
+      console.log('User not found');
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    // Create an empty default shopping cart
+    const defaultCart = new Panier({
+      user: user._id,
+    });
+
+    await defaultCart.save();
+
+    // Update user's defaultCart field
+    user.defaultCart = defaultCart._id;
+    await user.save();
+
+    res.status(201).json({ message: 'cart added to user', user });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+
+const getCartByUserId = async (req, res) => {
+  try {
+    const userId = req.params.id;
+    const user = await User.findById(userId).populate('defaultCart'); // Populate the defaultCart field
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    res.status(200).json(user.defaultCart);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+//------------------------------- Produit ----------------------------------------------//
+// const addProductToCart = async (req, res) => {
+//   try {
+//     const userId = req.params.userId;
+//     const productId = req.body.productId; // Assuming you send the product ID in the request body
+
+//     // Find the user by ID
+//     const user = await User.findById(userId).populate('defaultCart');
+
+//     if (!user) {
+//       return res.status(404).json({ error: 'User not found' });
+//     }
+
+//     // Add the product ID to the user's cart
+//     user.defaultCart.produits.push(productId);
+//     await user.save();
+
+//     res.status(201).json({ message: 'Product added to cart', user });
+//   } catch (error) {
+//     res.status(500).json({ error: error.message });
+//   }
+// };
+const addProductToCart = async (req, res) => {
+  try {
+    const userId = req.params.userId;
+    const productId = req.params.productId;
+
+    // Find the user by ID and populate the defaultCart field
+    const user = await User.findById(userId).populate('defaultCart');
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    // Check if the user's defaultCart is populated
+    if (!user.defaultCart) {
+      // Create a new Panier instance and add the product's ID
+      const newCart = new Panier({
+        user: user._id,
+        produits: [productId],
+      });
+
+      await newCart.save();
+
+      // Update the user's defaultCart field
+      user.defaultCart = newCart;
+      await user.save();
+    } else {
+      // Add the product's ID to the existing cart
+      user.defaultCart.produits.push(productId);
+      await user.defaultCart.save();
+    }
+
+    res.status(201).json({ message: 'Product added to cart', user });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+
+
+
+
+
+
+
+
+
+const getUserCartProducts = async (req, res) => {
+  try {
+    const userId = req.params.userId;
+
+    // Find the user by ID and populate the defaultCart field
+    const user = await User.findById(userId).populate({
+      path: 'defaultCart',
+      populate: {
+        path: 'produits',
+        model: 'ProduitDerive',
+      },
+    });
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    if (!user.defaultCart) {
+      return res.status(404).json({ error: 'Cart not found' });
+    }
+
+    const cartProducts = user.defaultCart.produits.map((produit) => ({
+      _id: produit._id,
+      nom: produit.nom,
+      description: produit.description,
+      prix: produit.prix,
+      qte: produit.qte,
+      imageP: produit.imageP,
+      categorie: produit.categorie,
+    }));
+
+    res.status(200).json(cartProducts);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+
 
 //-------------------- Face Detector -------------------------------------------//
 // const FaceDetectorAuth = async (email, avatar) => {
@@ -578,6 +683,13 @@ const LectureAuth = async (req, res) => {
     updateProfile,
     getUserReadBooks,
     addBookToLibrary,
-    LectureAuth
+    LectureAuth,
+    AjoutClub,
+    getUserClubs,
+    addMembersByInterests,
+    addDefaultCartToUser,
+    getCartByUserId,
+    addProductToCart,
+    getUserCartProducts
   };
   
