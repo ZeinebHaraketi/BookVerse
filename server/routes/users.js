@@ -1,12 +1,16 @@
 var express = require('express');
 const { register,login, logout, forgetPassword, reset_password, FaceDetectorAuth, authMiddleware, updateProfile, getUserReadBooks, addBookToLibrary, LectureAuth, AjoutClub, getUserClubs, addMembersByInterests, addDefaultCartToUser, getCartByUserId, addProductToCart, getUserCartProducts } = require('../controllers/userController');
 var router = express.Router();
+const http = require('http');
+
 
 const multer = require('multer');
 const cloudinary = require('cloudinary').v2;
 const { CloudinaryStorage } = require('multer-storage-cloudinary');
 const User = require('../models/users');
 const Livre = require('../models/livre');
+const Event = require('../models/event');
+
 
 
 
@@ -114,10 +118,81 @@ router.get('/getCart/:id', getCartByUserId);
 //Produits
 // router.post('/addProductToCart/:userId/', addProductToCart);
 router.post('/addProductToCart/:userId/:productId', addProductToCart);
-router.get('/cart/:userId/products', getUserCartProducts);
+router.get('/getUserCartProducts/:userId', getUserCartProducts);
 
 
+//Payment
+router.post('/payment', async (req, res) => {
+  try {
+    const flouciApiKey = process.env.FLOUCI_API_KEY;
+    const flouciApiSecret = process.env.FLOUCI_API_SECRET;
 
+    // Payment data from the request body
+    const paymentData = {
+      amount: req.body.amount,
+      description: req.body.description,
+      // Add any other required parameters
+    };
+
+    // Convert payment data to JSON
+    const postData = JSON.stringify(paymentData);
+
+    // Create options for the HTTP request
+    const options = {
+      hostname: 'api.flouci.com',
+      path: '/v1/payments',
+      method: 'POST',
+      headers: {
+        Authorization: `Basic ${Buffer.from(
+          `${flouciApiKey}:${flouciApiSecret}`
+        ).toString('base64')}`,
+        'Content-Type': 'application/json',
+      },
+    };
+
+    // Send the HTTP request
+    const request = http.request(options, (response) => {
+      let data = '';
+
+      // Collect response data
+      response.on('data', (chunk) => {
+        data += chunk;
+      });
+
+      // Handle the response when it's complete
+      response.on('end', () => {
+        const paymentResponse = JSON.parse(data);
+        console.log('Payment response:', paymentResponse);
+
+        // Send the payment response back to the client
+        res.json(paymentResponse);
+      });
+    });
+
+    // Handle errors in the HTTP request
+    request.on('error', (error) => {
+      console.error('Error making payment:', error);
+      res.status(500).json({ error: 'Payment failed' });
+    });
+
+    // Send the POST data
+    request.write(postData);
+    request.end();
+  } catch (error) {
+    console.error('Error processing payment:', error);
+    res.status(500).json({ error: 'Payment failed' });
+  }
+});
+
+//Event
+router.get("/event", authMiddleware, async (req, res) => {
+  try {
+    const events = await Event.find();
+    res.json(events);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
 
 // Route to get user profile
 router.get('/profile', authMiddleware, async (req, res) => {

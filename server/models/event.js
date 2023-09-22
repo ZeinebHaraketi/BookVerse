@@ -3,9 +3,10 @@ const mongoose = require('mongoose');
 const eventSchema = new mongoose.Schema({
   titre: { type: String, required: true },
   description: { type: String, required: true },
-  date: { type: Date,default: Date.now ,required: true },
-  time: { type: String, required: true },
-  location: { type: String, required: true },
+  date: { type: Date,default: Date.now  },
+  imageE: { type: String },
+  time: { type: String },
+  localisation: { type: String },
   clubDeLecture: { type: mongoose.Schema.Types.ObjectId, ref: 'ClubDeLecture' },
   adaptation: { type: mongoose.Schema.Types.ObjectId, ref: 'Adaptation' },
   organisateur: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },

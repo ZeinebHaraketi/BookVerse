@@ -79,7 +79,7 @@ function IndexNavbar() {
             target="_blank"
             title="Coded by Creative Tim"
           >
-            Paper Kit React
+            BookVerse
           </NavbarBrand>
           <button
             aria-expanded={navbarCollapse}
@@ -133,14 +133,7 @@ function IndexNavbar() {
               </NavLink>
             </NavItem>
             
-            <NavItem>
-              <NavLink
-                href="https://demos.creative-tim.com/paper-kit-react/#/documentation?ref=pkr-index-navbar"
-                target="_blank"
-              >
-                <i className="nc-icon nc-book-bookmark" /> Documentation
-              </NavLink>
-            </NavItem>
+            
             <NavItem>
               <Button
                 className="btn-round"

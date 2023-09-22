@@ -106,19 +106,7 @@ function DetailsLivres() {
         const data = response.data;
         setLivre(data);
 
-        //  // Fetch chapters by title
-        //  const responseChapitres = await axios.get(`${API}/livre/${id}/chapitres/titre`);
-        //  const dataChapitres = responseChapitres.data;
-        //  setChapitres(dataChapitres);
-
-
-        //  const chapitre = livre.chapitres.find(
-        //     (chapitre) => chapitre._id.toString() === chapitreId
-        //   );
-  
-        //   if (chapitre) {
-        //     setChapitre(chapitre);
-        //   }
+       
       } catch (error) {
         console.error("Error fetching book details:", error);
       }

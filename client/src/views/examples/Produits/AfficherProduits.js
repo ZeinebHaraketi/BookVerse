@@ -53,10 +53,11 @@ import DemoFooter from "components/Footers/DemoFooter.js";
 import { API } from "api_server";
 import axios from "axios";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faBook, faEye, faGamepad, faInfoCircle, faMoneyBill, faSearch, faTag } from "@fortawesome/free-solid-svg-icons";
+import { faBook, faEye, faGamepad, faInfoCircle, faMoneyBill, faMoneyBill1, faMoneyBill1Wave, faMoneyBills, faMoneyCheck, faMoneyCheckDollar, faSearch, faShoppingCart, faTag } from "@fortawesome/free-solid-svg-icons";
 
 // import "./AfficherLivres.css";
-import "../Livres/AfficherLivres.css";
+// import "../Livres/AfficherLivres.css";
+import "./AfficherProduits.css"
 import { useNavigate } from "react-router-dom";
 import ProduitHeader from "components/Headers/ProduitHeader";
 import MembreNavbar from "components/Navbars/MembreNavbar";
@@ -74,6 +75,19 @@ function AfficherProduits() {
   const navigate = useNavigate();
 
 
+//---------------------- UserId  ----------------------------------------//
+const pathParts = window.location.pathname.split("/");
+const userId = pathParts[pathParts.length - 1]; // Le dernier élément dans le chemin
+
+const handleAddToCart = async (productId) => {
+  try {
+    await axios.post(`${API}/addProductToCart/${userId}/${productId}`);
+    console.log("Product added Successfully to Cart");
+  } catch (error) {
+    console.error('Error adding product to cart:', error);
+    // Gérez les erreurs ici
+  }
+};
 
 
   const toggle = (tab) => {
@@ -160,6 +174,7 @@ function AfficherProduits() {
   };
 
 
+
   return (
     <>
       <MembreNavbar />
@@ -220,21 +235,22 @@ function AfficherProduits() {
                   </CardTitle>
 
                   <CardSubtitle className="card-subtitle">
-                    <FontAwesomeIcon icon={faMoneyBill} className="icon" />
-                    {produit.prix}
+                    <FontAwesomeIcon icon={faMoneyCheckDollar} className="icon" />
+                    {produit.prix} $
                   </CardSubtitle>
                   <CardText>
               <FontAwesomeIcon icon={faTag} className="icon" />
               {produit.categorie}
             </CardText>
             <CardFooter className="text-center">
-            {/* <Button
-                    // color="primary"
-                    onClick={() => navigate(`/detailsLivre/${livre._id}`)}
-                    className="details-button"
-                  >
-                    <FontAwesomeIcon icon={faGamepad} /> Details
-                  </Button> */}
+            <Button
+  onClick={() => handleAddToCart(produit._id)}
+  className="add-to-cart-button red-button"
+>
+  <FontAwesomeIcon icon={faShoppingCart} className="icon" />
+  Acheter
+</Button>
+
             </CardFooter>
             {/* <CardText className="card-text">
                     <FontAwesomeIcon icon={faInfoCircle} className="icon" />

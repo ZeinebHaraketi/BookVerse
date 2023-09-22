@@ -28,6 +28,7 @@ const port = process.env.PORT || 5000;
 //Les Routes
 var usersRouter = require('./routes/users');
 const livreRouter = require('./routes/livres');
+const eventRouter = require('./routes/event');
 const queteRouter = require('./routes/quete');
 const clubRouter = require('./routes/club');
 const chapitreRouter = require('./routes/chapitre');
@@ -81,6 +82,7 @@ mongoose.connect(dbURI, { useNewUrlParser: true, useUnifiedTopology: true })
 .then(()=>{
   console.log('Connected to database');
   app.use('/livre', livreRouter);
+  app.use('/event', eventRouter);
   app.use('/quete', queteRouter);
   app.use('/club', clubRouter);
   app.use('/chapitre', chapitreRouter);

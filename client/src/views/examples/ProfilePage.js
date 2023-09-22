@@ -63,6 +63,7 @@ import {
   faGamepad,
   faInfoCircle,
   faPlus,
+  faShoppingBasket,
   faStar,
   faTag,
   faUser,
@@ -238,6 +239,27 @@ function ProfilePage() {
     }
   };
 
+  const handleViewProducts = () => {
+    const token = localStorage.getItem("token");
+    
+
+    if (token) {
+      navigate(`/produits/${user._id}`);
+
+    }
+  };
+
+  const handleViewPanier = () => {
+    const token = localStorage.getItem("token");
+    
+
+    if (token) {
+      navigate(`/panier/${user._id}`);
+
+    }
+  };
+
+
   useEffect(() => {
     // Fetch user profile data after successful login
     const fetchUserProfile = async () => {
@@ -335,6 +357,21 @@ function ProfilePage() {
       <ProfilePageHeader />
     
       <br />
+<br></br>
+<br></br>
+<br></br>
+<br></br>
+
+      <div className="cart-button">
+      <Button
+        style={{ backgroundColor: '#3f51b5'}}
+        className="view-books-button" 
+          onClick={handleViewPanier}
+        >
+          <FontAwesomeIcon icon={faShoppingBasket} className="icon" />
+        </Button>
+      </div>
+
 
       <Container className="profile-page">
         <Row>
@@ -636,7 +673,7 @@ function ProfilePage() {
         <Button
         style={{ backgroundColor: '#3f51b5'}}
         className="view-books-button" 
-          onClick={handleViewBooks}
+          onClick={handleViewProducts}
         >
           <FontAwesomeIcon icon={faBoxOpen} className="icon" /> Afficher Tout les Produits
         </Button>

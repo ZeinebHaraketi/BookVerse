@@ -41,6 +41,7 @@ import DetailsLivres from "views/examples/Livres/DetailsLivres";
 import LectureLivre from "views/examples/Livres/LectureLivre";
 import BookList from "views/examples/Livres/BookListUser";
 import AfficherProduits from "views/examples/Produits/AfficherProduits";
+import AfficherPanier from "views/examples/Produits/AfficherPanier";
 
 
 // others
@@ -69,11 +70,13 @@ root.render(
       <Route path="/books/:id" element={<BookList />} />
 
 
-      <Route path="/produits" element={<AfficherProduits />} />
+      <Route path="/produits/:id" element={<AfficherProduits />} />
+      <Route path="/panier/:id" element={<AfficherPanier />} />
 
 
 
-      <Route path="*" element={<Navigate to="/login" replace />} />
+
+      <Route path="*" element={<Navigate to="/index" replace />} />
     </Routes>
   </BrowserRouter>
 );
